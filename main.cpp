@@ -1,40 +1,4 @@
-#define STB_IMAGE_IMPLEMENTATION
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
-
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include "stb_image.h"
-#include <iostream>
-#include "glm/glm/glm.hpp"          
-#include "glm/glm/gtc/matrix_transform.hpp"
-#include "glm/glm/gtc/type_ptr.hpp"
-#include "Camera.hpp"         
-
-// Vertex Shader
-const char* vertexShaderSource = R"(
-#version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec2 aTexCoord;
-out vec2 TexCoord;
-uniform mat4 projection;
-uniform mat4 view;
-void main() {
-    gl_Position = projection * view * vec4(aPos, 1.0);
-    TexCoord = aTexCoord;
-}
-)";
-
-// Fragment Shader
-const char* fragmentShaderSource = R"(
-#version 330 core
-out vec4 FragColor;
-in vec2 TexCoord;
-uniform sampler2D texture1;
-void main() {
-    FragColor = texture(texture1, TexCoord);
-}
-)";
+#include "main.hpp"
 
 // Function to compile shaders and create shader program
 unsigned int createShaderProgram(const char* vertexSource, const char* fragmentSource) {
@@ -78,6 +42,7 @@ unsigned int createShaderProgram(const char* vertexSource, const char* fragmentS
 }
 
 GLuint texture;
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
 double lastX = (float)WINDOW_WIDTH / 2.0;
 double lastY = (float)WINDOW_HEIGHT / 2.0;
 bool firstMouse = true;
@@ -99,6 +64,32 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     camera.processMouseMovement(xoffset, yoffset);
 }
 
+void processInput(GLFWwindow* window, Camera& camera, float deltaTime) {
+    // Keyboard input for position
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.processKeyboard(GLFW_KEY_W, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.processKeyboard(GLFW_KEY_S, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.processKeyboard(GLFW_KEY_A, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.processKeyboard(GLFW_KEY_D, deltaTime);
+
+    // Arrow key input for camera direction
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+        camera.processMouseMovement(0.0f, ARROW_ROTATION_SPEED * deltaTime); // Simulate upward mouse movement
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        camera.processMouseMovement(0.0f, -ARROW_ROTATION_SPEED * deltaTime);  // Simulate downward mouse movement
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+        camera.processMouseMovement(-ARROW_ROTATION_SPEED * deltaTime, 0.0f); // Simulate leftward mouse movement
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+        camera.processMouseMovement(ARROW_ROTATION_SPEED * deltaTime, 0.0f);  // Simulate rightward mouse movement
+
+    // Quit the program when Escape is pressed
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+}
+
 int main() {
     // Initialize GLFW
     if (!glfwInit()) {
@@ -115,12 +106,6 @@ int main() {
     }
     glfwMakeContextCurrent(window);
 
-	// Set up camera
-    Camera camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
-	// Set mouse callback function
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // Hide and capture the mouse
-
     // Initialize GLEW
     glewExperimental = true;
     if (glewInit() != GLEW_OK) {
@@ -129,9 +114,12 @@ int main() {
     }
 
     // Set up camera
-    Camera camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
+
+	// Set mouse callback function
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // Hide and capture the mouse
 
     // Load the texture
     int width, height, nrChannels;
@@ -214,29 +202,8 @@ int main() {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // Process keyboard input
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            camera.processKeyboard(GLFW_KEY_W, deltaTime);
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            camera.processKeyboard(GLFW_KEY_S, deltaTime);
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            camera.processKeyboard(GLFW_KEY_A, deltaTime);
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            camera.processKeyboard(GLFW_KEY_D, deltaTime);
-
-		// Add arrow key movement
-        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-            camera.processKeyboard(GLFW_KEY_W, deltaTime); // Move forward
-        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-            camera.processKeyboard(GLFW_KEY_S, deltaTime); // Move backward
-        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-            camera.processKeyboard(GLFW_KEY_A, deltaTime); // Move left
-        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-            camera.processKeyboard(GLFW_KEY_D, deltaTime); // Move right
-
-        // Quit the program when Escape is pressed
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            glfwSetWindowShouldClose(window, true);
+		// Process input
+		processInput(window, camera, deltaTime);
 
         // Set the view matrix
         glm::mat4 view = camera.getViewMatrix();
