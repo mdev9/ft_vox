@@ -13,6 +13,7 @@ public:
 
 private:
     GLuint textureID;
+    void generateDefaultTexture();
     void loadTexture(const std::string& path);
 };
 

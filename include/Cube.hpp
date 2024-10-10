@@ -10,12 +10,16 @@
 class Cube {
 public:
     Cube(const Texture& texture);
+    Cube(const Texture& textureTop, const Texture& textureSide, const Texture& textureBottom);
     void render(GLuint shaderID);
     void setupCube();
 
 private:
     GLuint VAO, VBO, EBO;
-    Texture texture;
+	bool isMultiTexture;
+	Texture topTexture;
+    Texture bottomTexture;
+	Texture texture;
 };
 
 #endif // CUBE_HPP

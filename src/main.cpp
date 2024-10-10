@@ -37,7 +37,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 }
 
 int main() {
-	float deltaTime, lastFrame;
+    float deltaTime, lastFrame;
     if (!glfwInit()) {
         std::cout << "Failed to initialize GLFW" << std::endl;
         return -1;
@@ -48,11 +48,11 @@ int main() {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
-	}
-   
+    }
+
     glfwMakeContextCurrent(window);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
     glewExperimental = GL_TRUE;
 
     if (glewInit() != GLEW_OK) {
@@ -61,38 +61,61 @@ int main() {
     }
 
     glEnable(GL_DEPTH_TEST);
-    
-    ShaderProgram shader("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
-    
-    Texture cubeTexture("assets/grass.png");
-    
-    Cube cube(cubeTexture);
 
-	while (!glfwWindowShouldClose(window)) {
-		float currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame; // Calculate delta time
-		lastFrame = currentFrame;
+    ShaderProgram shader("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
+
+    Texture grassSideTexture("assets/grass_side.png");
+    Texture grassTopTexture("assets/grass_top.png");
+    Texture dirtTexture("assets/dirt.png");
+    Texture cobbleTexture("assets/cobblestone.png");
+
+    // Create cubes
+    Cube cobbleCube(cobbleTexture);
+    Cube dirtCube(dirtTexture);
+    Cube grassCube(grassSideTexture, grassTopTexture, dirtTexture);
+
+    while (!glfwWindowShouldClose(window)) {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
 
         InputHandler::processInput(window, camera, deltaTime);
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		shader.use();
+        shader.use();
 
-		// Setup projection and view matrices
-		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
-		glm::mat4 view = camera.getViewMatrix();
+        // Setup projection and view matrices
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 view = camera.getViewMatrix();
 
-		GLint projLoc = glGetUniformLocation(shader.getID(), "projection");
-		GLint viewLoc = glGetUniformLocation(shader.getID(), "view");
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+        GLint projLoc = glGetUniformLocation(shader.getID(), "projection");
+        GLint viewLoc = glGetUniformLocation(shader.getID(), "view");
+        glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
-		cube.render(shader.getID());
+        // Render multiple cubes with different positions
+        glm::mat4 model = glm::mat4(1.0f); // Identity matrix
+        GLint modelLoc = glGetUniformLocation(shader.getID(), "model");
 
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-	glfwTerminate();
-	return 0;
+        // First Cube (Cobble) - Positioned at (0, 0, 0)
+        model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        cobbleCube.render(shader.getID());
+
+        // Second Cube (Dirt) - Positioned at (2, 0, 0)
+        model = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, 0.0f)); // Move to the right
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        dirtCube.render(shader.getID());
+
+        // Third Cube (Grass) - Positioned at (-2, 0, 0)
+        model = glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 0.0f, 0.0f)); // Move to the left
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        grassCube.render(shader.getID());
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+    glfwTerminate();
+    return 0;
 }
