@@ -1,7 +1,7 @@
 #include "Camera.hpp"
 
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
-    : front(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(2.5f), mouseSensitivity(0.05f) {
+    : front(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(2.5f), mouseSensitivity(0.05f), zoom(45.0f) {
     this->position = position;
     this->worldUp = up;
     this->yaw = yaw;
@@ -11,13 +11,13 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
 
 void Camera::processKeyboard(int direction, float deltaTime) {
     float velocity = CAMERA_SPEED * 10 * deltaTime;
-    if (direction == GLFW_KEY_W) // Forward
+    if (direction == GLFW_KEY_W)
         position += front * velocity;
-    if (direction == GLFW_KEY_S) // Backward
+    if (direction == GLFW_KEY_S)
         position -= front * velocity;
-    if (direction == GLFW_KEY_A) // Left
+    if (direction == GLFW_KEY_A)
         position -= right * velocity;
-    if (direction == GLFW_KEY_D) // Right
+    if (direction == GLFW_KEY_D)
         position += right * velocity;
 }
 

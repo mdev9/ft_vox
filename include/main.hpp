@@ -5,19 +5,14 @@
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
-
-#define MOUSE_SENSITIVITY 1.0f  // Mouse sensitivity adjustment
-#define ARROW_ROTATION_SPEED 2000.0f  // Arrow keys rotation speed
-
+#define WINDOW_NAME "ft_vox"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
-#include <iostream>
 #include <glm/glm.hpp>          
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "Camera.hpp"         
 
 // Vertex Shader
 const char* vertexShaderSource = R"(
