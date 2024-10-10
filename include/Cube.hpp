@@ -1,18 +1,23 @@
-// Cube.hpp
-#ifndef CUBE_H
-#define CUBE_H
+#ifndef CUBE_HPP
+#define CUBE_HPP
 
-#include <glm/glm.hpp>
 #include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 class Cube {
 public:
-    Cube();
-    void draw(GLuint shaderProgram);
+    Cube(GLuint texture);
+    void render(unsigned int shaderID);
 
 private:
-    GLuint VAO, VBO;
     void setupCube();
+
+    GLuint VAO;
+    GLuint VBO;
+    GLuint EBO;
+    GLuint texture;
 };
 
-#endif // CUBE_H
+#endif // CUBE_HPP
