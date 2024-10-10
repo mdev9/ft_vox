@@ -2,6 +2,7 @@
 #include "ShaderProgram.hpp"
 #include "InputHandler.hpp"
 #include "Camera.hpp"
+#include "Cube.hpp"
 
 GLuint texture;
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
@@ -56,10 +57,10 @@ int main() {
     // Set up vertex data, buffers, and shaders
 	float vertices[] = {
         // positions          // texture coords
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, // top right (flipped Y)
-         0.5f, -0.5f, 0.0f,   1.0f, 1.0f, // bottom right
-        -0.5f, -0.5f, 0.0f,   0.0f, 1.0f, // bottom left
-        -0.5f,  0.5f, 0.0f,   0.0f, 0.0f  // top left (flipped Y)
+         0.5f,  0.5f, 0.0f,   1.0f, 0.0f,
+         0.5f, -0.5f, 0.0f,   1.0f, 1.0f,
+        -0.5f, -0.5f, 0.0f,   0.0f, 1.0f,
+        -0.5f,  0.5f, 0.0f,   0.0f, 0.0f
     };
     unsigned int indices[] = {
         0, 1, 3, // first triangle
