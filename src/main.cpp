@@ -3,16 +3,41 @@
 #include "InputHandler.hpp"
 #include "Camera.hpp"
 #include "Cube.hpp"
+#include "Texture.hpp"
 
-GLuint texture;
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
 double lastX = WINDOW_WIDTH / 2.0;
 double lastY = WINDOW_HEIGHT / 2.0;
 bool firstMouse = true;
 
-int main() {
-    float lastFrame = 0.0f;
+void processInput(GLFWwindow* window) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, true);
+    }
+}
 
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+	(void) window;
+    static double lastX = WINDOW_WIDTH / 2.0;
+    static double lastY = WINDOW_HEIGHT / 2.0;
+    static bool firstMouse = true;
+
+    if (firstMouse) {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos;
+    lastX = xpos;
+    lastY = ypos;
+
+    camera.processMouseMovement(xoffset, yoffset);
+}
+
+int main() {
+	float deltaTime, lastFrame;
     if (!glfwInit()) {
         std::cout << "Failed to initialize GLFW" << std::endl;
         return -1;
@@ -23,65 +48,51 @@ int main() {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
-    }
+	}
+   
     glfwMakeContextCurrent(window);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouse_callback);
+    glewExperimental = GL_TRUE;
 
-    glewExperimental = true;
     if (glewInit() != GLEW_OK) {
         std::cout << "Failed to initialize GLEW" << std::endl;
         return -1;
     }
 
-    // Set input callbacks
-    glfwSetCursorPosCallback(window, InputHandler::mouseCallback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glEnable(GL_DEPTH_TEST);
+    
+    ShaderProgram shader("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
+    
+    Texture cubeTexture("assets/grass.png");
+    
+    Cube cube(cubeTexture);
 
-    // Load texture
-    int width, height, nrChannels;
-    glGenTextures(1, &texture);
-    unsigned char* data = stbi_load("assets/grass.png", &width, &height, &nrChannels, 0);
-    if (data) {
-        GLenum format = nrChannels == 4 ? GL_RGBA : GL_RGB;
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    } else {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
+	while (!glfwWindowShouldClose(window)) {
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame; // Calculate delta time
+		lastFrame = currentFrame;
 
-    // Cube initialization
-    Cube cube(texture);
-
-    ShaderProgram shaderProgram;
-    unsigned int shaderID = shaderProgram.createShaderProgram(vertexShaderSource, fragmentShaderSource);
-    glUseProgram(shaderID);
-
-    while (!glfwWindowShouldClose(window)) {
-        float currentFrame = glfwGetTime();
-        float deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-
-        // Input handling
         InputHandler::processInput(window, camera, deltaTime);
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glm::mat4 view = camera.getViewMatrix();
-        glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
-        glUniformMatrix4fv(glGetUniformLocation(shaderID, "view"), 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(glGetUniformLocation(shaderID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Draw cube
-        cube.render(shaderID);
+		shader.use();
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
+		// Setup projection and view matrices
+		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+		glm::mat4 view = camera.getViewMatrix();
 
-    glfwTerminate();
-    return 0;
+		GLint projLoc = glGetUniformLocation(shader.getID(), "projection");
+		GLint viewLoc = glGetUniformLocation(shader.getID(), "view");
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+		cube.render(shader.getID());
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
+	glfwTerminate();
+	return 0;
 }

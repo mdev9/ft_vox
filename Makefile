@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -std=c++11 -g -Wextra -Werror -Wall -Iinclude -Ilib -Ilib/glm
+CFLAGS = -std=c++11 -g -Wextra -Werror -Wall -Iinclude -Ilib/stb -Ilib/glm
 LDFLAGS = -lglfw -lGL -lGLEW -lm
 
 SRC_DIR = src
@@ -20,9 +20,12 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(INC_DIR)/%.hpp
 	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-.PHONY: clean re
+.PHONY: clean fclean re
 
 clean:
+	rm -rf $(OBJ_DIR)
+
+fclean:
 	rm -rf $(OBJ_DIR) $(EXEC)
 
-re: clean $(EXEC)
+re: fclean $(EXEC)

@@ -1,15 +1,21 @@
-#ifndef SHADER_PROGRAM_HPP
-#define SHADER_PROGRAM_HPP
+#ifndef SHADERPROGRAM_HPP
+#define SHADERPROGRAM_HPP
 
 #include <GL/glew.h>
-#include <iostream>
+#include <string>
 
 class ShaderProgram {
 public:
-    unsigned int createShaderProgram(const char* vertexSource, const char* fragmentSource);
+    ShaderProgram(const char* vertexPath, const char* fragmentPath);
+    void use();
+    GLuint getID() const;
 
 private:
-    void checkShaderCompileErrors(unsigned int shader, const std::string& type);
+    GLuint programID;
+
+    std::string readShaderSource(const char* filePath);
+    void checkCompileErrors(GLuint shader, const std::string& type); // Add this line
+    void linkProgram();
 };
 
-#endif
+#endif // SHADERPROGRAM_HPP
