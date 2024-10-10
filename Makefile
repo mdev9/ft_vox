@@ -1,28 +1,28 @@
-# Variables
-CXX = g++
-CXXFLAGS = -std=c++11 -Wall -I.
+CC = g++
+CFLAGS = -std=c++11 -g -Wextra -Werror -Wall -Iinclude -Ilib -Ilib/glm
 LDFLAGS = -lglfw -lGL -lGLEW -lm
-SRC = main.cpp Camera.cpp
-OBJ = $(SRC:.cpp=.o)
-TARGET = ft_vox
 
-# Default target
-all: $(TARGET)
+SRC_DIR = src
+OBJ_DIR = obj
+BIN_DIR = .
+INC_DIR = include
 
-# Linking
-$(TARGET): $(OBJ)
-	$(CXX) -o $@ $^ $(LDFLAGS)
+SRCS = $(wildcard $(SRC_DIR)/*.cpp)
+OBJS = $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
-# Compiling .cpp files to .o files
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+EXEC = $(BIN_DIR)/ft_vox
 
-# Clean target
+$(EXEC): $(OBJS)
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(OBJS) -o $(EXEC) $(LDFLAGS)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(INC_DIR)/%.hpp
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+.PHONY: clean re
+
 clean:
-	rm -f $(OBJ)
+	rm -rf $(OBJ_DIR) $(EXEC)
 
-# Rebuild target
-re: clean all
-
-# Phony targets
-.PHONY: all clean re
+re: clean $(EXEC)
