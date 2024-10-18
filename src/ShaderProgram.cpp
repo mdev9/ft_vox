@@ -3,76 +3,103 @@
 #include <sstream>
 #include <iostream>
 
-ShaderProgram::ShaderProgram(const char* vertexPath, const char* fragmentPath) {
-    // Load the vertex shader
-    std::string vertexCode = readShaderSource(vertexPath);
-    const char* vertexSource = vertexCode.c_str();
+ShaderProgram::ShaderProgram(const glm::mat4& proj, const glm::mat4& view)
+    : m_proj(proj), m_view(view), m_model(glm::mat4(1.0f))
+{
+    // Load and compile shaders, then link into a program
+    quadProgram = getProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
 
-    // Load the fragment shader
-    std::string fragmentCode = readShaderSource(fragmentPath);
-    const char* fragmentSource = fragmentCode.c_str();
-
-    // Compile shaders
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexSource, nullptr);
-    glCompileShader(vertexShader);
-    checkCompileErrors(vertexShader, "VERTEX"); // Check for compile errors
-
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentSource, nullptr);
-    glCompileShader(fragmentShader);
-    checkCompileErrors(fragmentShader, "FRAGMENT"); // Check for compile errors
-
-    // Link the program
-    programID = glCreateProgram();
-    glAttachShader(programID, vertexShader);
-    glAttachShader(programID, fragmentShader);
-    linkProgram();
-
-    // Clean up shaders
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    // Set initial uniforms
+    setUniformsOnInit();
 }
 
-std::string ShaderProgram::readShaderSource(const char* filePath) {
-    std::ifstream file(filePath);
-    std::stringstream buffer;
-
-    if (!file.is_open()) {
-        std::cerr << "Could not open shader file: " << filePath << std::endl;
-        return ""; // Return empty string if the file can't be opened
-    }
-
-    buffer << file.rdbuf();
-    return buffer.str();
+void ShaderProgram::setUniformsOnInit() {
+    glUseProgram(quadProgram);
+    // Set the projection matrix (m_proj)
+    glUniformMatrix4fv(glGetUniformLocation(quadProgram, "m_proj"), 1, GL_FALSE, glm::value_ptr(m_proj));
+    // Set the model matrix (m_model)
+    glUniformMatrix4fv(glGetUniformLocation(quadProgram, "m_model"), 1, GL_FALSE, glm::value_ptr(m_model));
 }
 
-void ShaderProgram::checkCompileErrors(GLuint shader, const std::string& type) {
+void ShaderProgram::update() {
+    glUseProgram(quadProgram);
+    // Update the view matrix (m_view)
+    glUniformMatrix4fv(glGetUniformLocation(quadProgram, "m_view"), 1, GL_FALSE, glm::value_ptr(m_view));
+}
+
+GLuint ShaderProgram::getProgram(const std::string& vertexPath, const std::string& fragmentPath) {
+    // Load vertex and fragment shaders
+    std::string vertexCode = loadShaderCode(vertexPath);
+    std::string fragmentCode = loadShaderCode(fragmentPath);
+
+    GLuint vertexShader = compileShader(vertexCode.c_str(), GL_VERTEX_SHADER);
+    GLuint fragmentShader = compileShader(fragmentCode.c_str(), GL_FRAGMENT_SHADER);
+
+    // Create and link the program
+    GLuint shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+
+    // Check for linking errors
     GLint success;
     GLchar infoLog[512];
-    if (type != "PROGRAM") {
-        glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-        if (!success) {
-            glGetShaderInfoLog(shader, 512, NULL, infoLog);
-            std::cerr << "ERROR::SHADER::" << type << "::COMPILATION_FAILED\n" << infoLog << std::endl;
-        }
-    } else {
-        glGetProgramiv(shader, GL_LINK_STATUS, &success);
-        if (!success) {
-            glGetProgramInfoLog(shader, 512, NULL, infoLog);
-            std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-        }
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+		glDeleteProgram(shaderProgram);
+		return 0;
     }
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    return shaderProgram;
 }
 
-void ShaderProgram::linkProgram() {
-    glLinkProgram(programID);
+std::string ShaderProgram::loadShaderCode(const std::string& filePath) {
+    std::ifstream shaderFile;
+    std::stringstream shaderStream;
+
+    shaderFile.open(filePath);
+    if (shaderFile.fail()) {
+        std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ: " << filePath << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    shaderStream << shaderFile.rdbuf();
+
+    shaderFile.close();
+
+    return shaderStream.str();
 }
 
-void ShaderProgram::use() {
-    glUseProgram(programID);
+GLuint ShaderProgram::compileShader(const char* shaderSource, GLenum shaderType) {
+	if (shaderSource == nullptr || strlen(shaderSource) == 0) {
+        std::cerr << "ERROR::SHADER::SOURCE_IS_EMPTY\n";
+        return 0;
+    }
+
+    GLuint shader = glCreateShader(shaderType);
+
+    glShaderSource(shader, 1, &shaderSource, nullptr);
+    glCompileShader(shader);
+
+    // Check for compilation errors
+    GLint success;
+    GLchar infoLog[512];
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(shader, 512, nullptr, infoLog);
+        std::cerr << "ERROR::SHADER::COMPILATION_FAILED\n" << infoLog << std::endl;
+		glDeleteShader(shader);
+		return 0;
+    }
+
+    return shader;
 }
 
-GLuint ShaderProgram::getID() const {
-    return programID;
+ShaderProgram::~ShaderProgram() {
+    glDeleteProgram(quadProgram);
 }

@@ -1,21 +1,28 @@
-#ifndef SHADERPROGRAM_HPP
-#define SHADERPROGRAM_HPP
+#ifndef SHADER_PROGRAM_HPP
+#define SHADER_PROGRAM_HPP
 
 #include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <string>
 
 class ShaderProgram {
 public:
-    ShaderProgram(const char* vertexPath, const char* fragmentPath);
-    void use();
-    GLuint getID() const;
+    ShaderProgram(const glm::mat4& proj, const glm::mat4& view);
+	~ShaderProgram();
+
+    void setUniformsOnInit();
+    void update();
 
 private:
-    GLuint programID;
+    GLuint quadProgram;
+    glm::mat4 m_proj;
+    glm::mat4 m_view;
+    glm::mat4 m_model;
 
-    std::string readShaderSource(const char* filePath);
-    void checkCompileErrors(GLuint shader, const std::string& type); // Add this line
-    void linkProgram();
+    GLuint getProgram(const std::string& vertexPath, const std::string& fragmentPath);
+    std::string loadShaderCode(const std::string& filePath);
+    GLuint compileShader(const char* shaderSource, GLenum shaderType);
 };
 
-#endif // SHADERPROGRAM_HPP
+#endif

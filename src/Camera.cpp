@@ -1,49 +1,39 @@
 #include "Camera.hpp"
 
-Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
-    : front(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(2.5f), mouseSensitivity(0.05f), zoom(45.0f) {
-    this->position = position;
-    this->worldUp = up;
-    this->yaw = yaw;
-    this->pitch = pitch;
-    updateCameraVectors();
+Camera::Camera(const glm::vec3& position, float yaw, float pitch) : 
+	position(position), yaw(glm::radians(yaw)), pitch(glm::radians(pitch)),
+	up(glm::vec3(0, 1, 0)), forward(glm::vec3(0, 0, -1)), right(glm::vec3(1, 0, 0)) {
+	m_proj = glm::perspective(V_FOV, ASPECT_RATIO, NEAR, FAR);
+	update();
 }
 
-void Camera::processKeyboard(int direction, float deltaTime) {
-    float velocity = CAMERA_SPEED * 10 * deltaTime;
-    if (direction == GLFW_KEY_W)
-        position += front * velocity;
-    if (direction == GLFW_KEY_S)
-        position -= front * velocity;
-    if (direction == GLFW_KEY_A)
-        position -= right * velocity;
-    if (direction == GLFW_KEY_D)
-        position += right * velocity;
+void Camera::update() {
+	updateVectors();
+	updateViewMatrix();
 }
 
-void Camera::processMouseMovement(float xoffset, float yoffset) {
-    xoffset *= mouseSensitivity;
-    yoffset *= mouseSensitivity;
-
-    yaw += xoffset;
-    pitch += yoffset;
-
-    if (pitch > 89.0f) pitch = 89.0f;
-    if (pitch < -89.0f) pitch = -89.0f;
-
-    updateCameraVectors();
+void Camera::updateViewMatrix() {
+	m_view = glm::lookAt(position, position + forward, up);
 }
 
-void Camera::updateCameraVectors() {
-    glm::vec3 front;
-    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    front.y = sin(glm::radians(pitch));
-    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    this->front = glm::normalize(front);
-    right = glm::normalize(glm::cross(this->front, worldUp));
-    up = glm::normalize(glm::cross(right, this->front));
+void Camera::updateVectors() {
+	forward.x = cos(yaw) * cos(pitch);
+	forward.y = sin(pitch);
+	forward.z = sin(yaw) * cos(pitch);
+	forward = glm::normalize(forward);
+	right = glm::normalize(glm::cross(forward, glm::vec3(0, 1, 0)));
+	up = glm::normalize(glm::cross(right, forward));
 }
 
-glm::mat4 Camera::getViewMatrix() {
-    return glm::lookAt(position, position + front, up);
+void Camera::rotatePitch(float delta_y) {
+	pitch -= delta_y;
+	pitch = glm::clamp(pitch, -PITCH_MAX, PITCH_MAX);
+}
+
+void Camera::rotateYaw(float delta_x) {
+	yaw += delta_x;
+}
+
+void Camera::move(const glm::vec3& direction, float velocity) {
+	position += direction * velocity;
 }
