@@ -1,15 +1,12 @@
-#ifndef QUADMESH_HPP
-#define QUADMESH_HPP
-
 #include "BaseMesh.hpp"
+#include "ShaderProgram.hpp"
+#include <glm/glm.hpp>
 
 class QuadMesh : public BaseMesh {
 	public:
-		QuadMesh();
-		void draw() const override;
+		QuadMesh(ShaderProgram* shaderProgram);
+		std::vector<glm::vec3> getVertexData() override;
 
 	private:
-		void initializeMesh();
+		void createMesh();
 };
-
-#endif

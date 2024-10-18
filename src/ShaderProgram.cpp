@@ -7,7 +7,7 @@ ShaderProgram::ShaderProgram(const glm::mat4& proj, const glm::mat4& view)
     : m_proj(proj), m_view(view), m_model(glm::mat4(1.0f))
 {
     // Load and compile shaders, then link into a program
-    quadProgram = getProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
+    quadProgram = loadProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
 
     // Set initial uniforms
     setUniformsOnInit();
@@ -27,7 +27,7 @@ void ShaderProgram::update() {
     glUniformMatrix4fv(glGetUniformLocation(quadProgram, "m_view"), 1, GL_FALSE, glm::value_ptr(m_view));
 }
 
-GLuint ShaderProgram::getProgram(const std::string& vertexPath, const std::string& fragmentPath) {
+GLuint ShaderProgram::loadProgram(const std::string& vertexPath, const std::string& fragmentPath) {
     // Load vertex and fragment shaders
     std::string vertexCode = loadShaderCode(vertexPath);
     std::string fragmentCode = loadShaderCode(fragmentPath);
@@ -98,6 +98,10 @@ GLuint ShaderProgram::compileShader(const char* shaderSource, GLenum shaderType)
     }
 
     return shader;
+}
+
+GLuint ShaderProgram::getProgram() {
+	return quadProgram;
 }
 
 ShaderProgram::~ShaderProgram() {

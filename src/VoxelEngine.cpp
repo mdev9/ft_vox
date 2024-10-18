@@ -66,7 +66,7 @@ void VoxelEngine::onInit()
 
     player = new Player(this);
     shaderProgram = new ShaderProgram(proj, view);
-    scene = new Scene();
+    scene = new Scene(this);
 }
 
 void VoxelEngine::update()
@@ -78,6 +78,7 @@ void VoxelEngine::update()
 
     player->update();
     shaderProgram->update();
+	scene->update();
 
     // Set window title with FPS
     std::string title = std::to_string(1.0 / deltaTime);

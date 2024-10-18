@@ -1,36 +1,33 @@
 #include "QuadMesh.hpp"
 
-QuadMesh::QuadMesh() {
-    initializeMesh();
+QuadMesh::QuadMesh(ShaderProgram* shaderProgram) {
+    this->program = shaderProgram->getProgram();
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
+    createMesh();
 }
 
-void QuadMesh::initializeMesh() {
-    vertices = {
-        { -0.5f,  0.5f, 0.0f },
-        {  0.5f,  0.5f, 0.0f },
-        { -0.5f, -0.5f, 0.0f },
-        {  0.5f, -0.5f, 0.0f }
-    };
+void QuadMesh::createMesh() {
+    auto vertexData = getVertexData();
+    vertexCount = vertexData.size();
 
-    uvs = {
-        { 0.0f, 1.0f },
-        { 1.0f, 1.0f },
-        { 0.0f, 0.0f },
-        { 1.0f, 0.0f }
-    };
+    glBindVertexArray(vao);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(glm::vec3), vertexData.data(), GL_STATIC_DRAW);
+    
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0); // Position
+    glEnableVertexAttribArray(0);
 
-    normals = {
-        { 0.0f, 0.0f, 1.0f }, // All normals point forward
-        { 0.0f, 0.0f, 1.0f },
-        { 0.0f, 0.0f, 1.0f },
-        { 0.0f, 0.0f, 1.0f }
-    };
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3) * 2, (GLvoid*)(sizeof(glm::vec3))); // Color
+    glEnableVertexAttribArray(1);
 
-    setupMesh(); // Setup buffers using the base class method
-}
-
-void QuadMesh::draw() const {
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Drawing the quad
     glBindVertexArray(0);
+}
+
+std::vector<glm::vec3> QuadMesh::getVertexData() {
+    return {
+        {0.5f, 0.5f, 0.0f}, {-0.5f, 0.5f, 0.0f}, {-0.5f, -0.5f, 0.0f},
+        {0.5f, 0.5f, 0.0f}, {-0.5f, -0.5f, 0.0f}, {0.5f, -0.5f, 0.0f}
+    };
 }

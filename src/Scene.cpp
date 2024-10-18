@@ -1,9 +1,8 @@
 #include "Scene.hpp"
-#include "ShaderProgram.hpp"
 
-#include <iostream> //debug
-
-Scene::Scene() {}
+Scene::Scene(VoxelEngine* engine) {
+    addMesh(new QuadMesh(engine->shaderProgram));
+}
 
 Scene::~Scene() {
     for (BaseMesh* mesh : meshes) {
@@ -15,11 +14,16 @@ void Scene::addMesh(BaseMesh* mesh) {
     meshes.push_back(mesh);
 }
 
+void Scene::update() {
+    // Update logic for your scene
+	return ;
+}
+
 void Scene::render() {
-	int i = 0;
-    for (BaseMesh* mesh : meshes) {
-		i++;
-        mesh->draw();
-    }
-	std::cout << "rendered " << i << "meshes\n";
+	for (BaseMesh* mesh : meshes) {
+		glUseProgram(mesh->getProgram());
+		glBindVertexArray(mesh->getVAO());
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
+	}
 }

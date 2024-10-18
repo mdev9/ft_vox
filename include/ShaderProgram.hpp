@@ -11,8 +11,11 @@ public:
     ShaderProgram(const glm::mat4& proj, const glm::mat4& view);
 	~ShaderProgram();
 
+	GLuint getProgram();
+
     void setUniformsOnInit();
     void update();
+
 
 private:
     GLuint quadProgram;
@@ -20,7 +23,7 @@ private:
     glm::mat4 m_view;
     glm::mat4 m_model;
 
-    GLuint getProgram(const std::string& vertexPath, const std::string& fragmentPath);
+    GLuint loadProgram(const std::string& vertexPath, const std::string& fragmentPath);
     std::string loadShaderCode(const std::string& filePath);
     GLuint compileShader(const char* shaderSource, GLenum shaderType);
 };

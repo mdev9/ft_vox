@@ -9,6 +9,8 @@
 #include "Scene.hpp"
 #include <iostream>
 
+class Scene;
+
 class VoxelEngine {
 	public:
 		GLFWwindow* window;

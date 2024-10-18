@@ -1,22 +1,20 @@
-#ifndef BASEMESH_HPP
-#define BASEMESH_HPP
-
-#include <vector>
-#include <glm/glm.hpp>
 #include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <vector>
 
 class BaseMesh {
-	public:
-		virtual ~BaseMesh() = default;
-		virtual void draw() const = 0;
+public:
+    BaseMesh();
+    virtual ~BaseMesh();
 
-	protected:
-		GLuint VAO, VBO, UVBO, NBO;
-		std::vector<glm::vec3> vertices;
-		std::vector<glm::vec2> uvs;
-		std::vector<glm::vec3> normals;
+    virtual std::vector<glm::vec3> getVertexData() = 0;
+    GLuint getVAO();
+	GLuint getProgram();
 
-		void setupMesh();
+protected:
+    GLuint vao;
+    GLuint vbo;
+    GLuint program;
+    int vertexCount;
+    void setupMesh();
 };
-
-#endif
