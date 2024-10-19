@@ -21,9 +21,6 @@ void Scene::update() {
 
 void Scene::render() {
 	for (BaseMesh* mesh : meshes) {
-		glUseProgram(mesh->getProgram());
-		glBindVertexArray(mesh->getVAO());
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glBindVertexArray(0);
+		mesh->render();
 	}
 }

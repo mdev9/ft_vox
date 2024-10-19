@@ -8,6 +8,8 @@ public:
     virtual ~BaseMesh();
 
     virtual std::vector<float> getVertexData() = 0;
+	virtual void render() = 0;
+
     GLuint getVAO();
 	GLuint getProgram();
 

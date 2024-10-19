@@ -6,6 +6,7 @@ class QuadMesh : public BaseMesh {
 	public:
 		QuadMesh(ShaderProgram* shaderProgram);
 		std::vector<float> getVertexData() override;
+		void render() override;
 
 	private:
 		void createMesh();

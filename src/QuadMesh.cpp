@@ -40,3 +40,10 @@ std::vector<float> QuadMesh::getVertexData() {
 
     return vertexData;
 }
+
+void QuadMesh::render() {
+    glUseProgram(getProgram());
+    glBindVertexArray(getVAO());
+    glDrawArrays(GL_TRIANGLES, 0, 6); // Draw the quad (2 triangles)
+    glBindVertexArray(0);
+}
