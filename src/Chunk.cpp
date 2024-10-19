@@ -21,9 +21,8 @@ std::vector<uint8_t> Chunk::buildVoxels() {
     for (int x = 0; x < CHUNK_SIZE; ++x) {
         for (int z = 0; z < CHUNK_SIZE; ++z) {
             for (int y = 0; y < CHUNK_SIZE; ++y) {
-                voxels[x + CHUNK_SIZE * z + CHUNK_AREA * y] = (
-                    (x + y + z) // * (glm::simplex(glm::vec3(x, y, z) * 0.1f) + 1)
-                );
+                voxels[x + CHUNK_SIZE * z + CHUNK_AREA * y] = x + y + z;
+                //voxels[x + CHUNK_SIZE * z + CHUNK_AREA * y] = 1;
             }
         }
     }

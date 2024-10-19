@@ -48,8 +48,8 @@ GLuint ChunkMesh::createVAO() {
 	std::vector<uint8_t> vertexData = getVertexData();
 	vertexCount = vertexData.size() / formatSize;
 
-	std::cout << "Vertex data size: " << vertexData.size() << std::endl;
-	std::cout << "Vertex count: " << vertexCount << std::endl;
+	//std::cout << "Vertex data size: " << vertexData.size() << std::endl;
+	//std::cout << "Vertex count: " << vertexCount << std::endl;
 
 	// Create and bind the VBO
 	glGenBuffers(1, &vbo);
