@@ -5,7 +5,7 @@
 class QuadMesh : public BaseMesh {
 	public:
 		QuadMesh(ShaderProgram* shaderProgram);
-		std::vector<glm::vec3> getVertexData() override;
+		std::vector<float> getVertexData() override;
 
 	private:
 		void createMesh();

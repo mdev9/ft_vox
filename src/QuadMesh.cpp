@@ -9,25 +9,34 @@ QuadMesh::QuadMesh(ShaderProgram* shaderProgram) {
 
 void QuadMesh::createMesh() {
     auto vertexData = getVertexData();
-    vertexCount = vertexData.size();
+    vertexCount = vertexData.size() / 6;
 
     glBindVertexArray(vao);
     
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(glm::vec3), vertexData.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(float), vertexData.data(), GL_STATIC_DRAW);
     
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0); // Position
+    // Vertex positions
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3) * 2, (GLvoid*)(sizeof(glm::vec3))); // Color
+    // Vertex colors
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
 }
 
-std::vector<glm::vec3> QuadMesh::getVertexData() {
-    return {
-        {0.5f, 0.5f, 0.0f}, {-0.5f, 0.5f, 0.0f}, {-0.5f, -0.5f, 0.0f},
-        {0.5f, 0.5f, 0.0f}, {-0.5f, -0.5f, 0.0f}, {0.5f, -0.5f, 0.0f}
+std::vector<float> QuadMesh::getVertexData() {
+    std::vector<float> vertexData = {
+        // Position            // Color
+         0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f,  // Top Right
+        -0.5f,  0.5f, 0.0f,     1.0f, 0.0f, 0.0f,  // Top Left
+        -0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 0.0f,  // Bottom Left
+         0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f,  // Top Right
+        -0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 0.0f,  // Bottom Left
+         0.5f, -0.5f, 0.0f,     0.0f, 0.0f, 1.0f   // Bottom Right
     };
+
+    return vertexData;
 }

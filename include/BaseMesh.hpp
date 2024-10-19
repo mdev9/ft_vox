@@ -7,7 +7,7 @@ public:
     BaseMesh();
     virtual ~BaseMesh();
 
-    virtual std::vector<glm::vec3> getVertexData() = 0;
+    virtual std::vector<float> getVertexData() = 0;
     GLuint getVAO();
 	GLuint getProgram();
 
