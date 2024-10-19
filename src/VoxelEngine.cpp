@@ -61,11 +61,8 @@ VoxelEngine::~VoxelEngine()
 
 void VoxelEngine::onInit()
 {
-    proj = glm::perspective(glm::radians(45.0f), (float)WIN_RES.x / (float)WIN_RES.y, 0.1f, 100.0f);
-    view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
-
     player = new Player(this);
-    shaderProgram = new ShaderProgram(proj, view);
+    shaderProgram = new ShaderProgram(player);
     scene = new Scene(this);
 }
 

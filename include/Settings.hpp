@@ -17,7 +17,7 @@ const float FAR = 2000.0f;
 const float PITCH_MAX = glm::radians(89.0f);
 
 // Player settings
-const float PLAYER_SPEED = 0.005f;
+const float PLAYER_SPEED = 5.0f;
 const float PLAYER_ROT_SPEED = 0.003f;
 const glm::vec3 PLAYER_POS(0.0f, 0.0f, 1.0f);
 const float MOUSE_SENSITIVITY = 0.002f;

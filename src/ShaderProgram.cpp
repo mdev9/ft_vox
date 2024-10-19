@@ -1,11 +1,13 @@
 #include "ShaderProgram.hpp"
+#include "VoxelEngine.hpp"
 #include <fstream>
 #include <sstream>
 #include <iostream>
 
-ShaderProgram::ShaderProgram(const glm::mat4& proj, const glm::mat4& view)
-    : m_proj(proj), m_view(view), m_model(glm::mat4(1.0f))
+ShaderProgram::ShaderProgram(Player* player)
 {
+	this->player = player;
+	
     // Load and compile shaders, then link into a program
     quadProgram = loadProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
 
@@ -14,14 +16,18 @@ ShaderProgram::ShaderProgram(const glm::mat4& proj, const glm::mat4& view)
 }
 
 void ShaderProgram::setUniformsOnInit() {
+	m_proj = player->m_proj;
+
     glUseProgram(quadProgram);
     // Set the projection matrix (m_proj)
     glUniformMatrix4fv(glGetUniformLocation(quadProgram, "m_proj"), 1, GL_FALSE, glm::value_ptr(m_proj));
     // Set the model matrix (m_model)
-    glUniformMatrix4fv(glGetUniformLocation(quadProgram, "m_model"), 1, GL_FALSE, glm::value_ptr(m_model));
+    glUniformMatrix4fv(glGetUniformLocation(quadProgram, "m_model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
 }
 
 void ShaderProgram::update() {
+	m_view = player->m_view;
+
     glUseProgram(quadProgram);
     // Update the view matrix (m_view)
     glUniformMatrix4fv(glGetUniformLocation(quadProgram, "m_view"), 1, GL_FALSE, glm::value_ptr(m_view));
