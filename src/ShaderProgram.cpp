@@ -9,7 +9,7 @@ ShaderProgram::ShaderProgram(Player* player)
 	this->player = player;
 	
     // Load and compile shaders, then link into a program
-    quadProgram = loadProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
+    chunkProgram = loadProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
 
     // Set initial uniforms
     setUniformsOnInit();
@@ -18,19 +18,20 @@ ShaderProgram::ShaderProgram(Player* player)
 void ShaderProgram::setUniformsOnInit() {
 	m_proj = player->m_proj;
 
-    glUseProgram(quadProgram);
+    glUseProgram(chunkProgram);
     // Set the projection matrix (m_proj)
-    glUniformMatrix4fv(glGetUniformLocation(quadProgram, "m_proj"), 1, GL_FALSE, glm::value_ptr(m_proj));
+    glUniformMatrix4fv(glGetUniformLocation(chunkProgram, "m_proj"), 1, GL_FALSE, glm::value_ptr(m_proj));
     // Set the model matrix (m_model)
-    glUniformMatrix4fv(glGetUniformLocation(quadProgram, "m_model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+    glUniformMatrix4fv(glGetUniformLocation(chunkProgram, "m_model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+	//std::cout << "Projection matrix:\n" << glm::to_string(m_proj) << std::endl;
 }
 
 void ShaderProgram::update() {
 	m_view = player->m_view;
 
-    glUseProgram(quadProgram);
+    glUseProgram(chunkProgram);
     // Update the view matrix (m_view)
-    glUniformMatrix4fv(glGetUniformLocation(quadProgram, "m_view"), 1, GL_FALSE, glm::value_ptr(m_view));
+    glUniformMatrix4fv(glGetUniformLocation(chunkProgram, "m_view"), 1, GL_FALSE, glm::value_ptr(m_view));
 }
 
 GLuint ShaderProgram::loadProgram(const std::string& vertexPath, const std::string& fragmentPath) {
@@ -60,6 +61,10 @@ GLuint ShaderProgram::loadProgram(const std::string& vertexPath, const std::stri
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+
+	if (shaderProgram == 0) {
+		std::cerr << "Shader program is not created!" << std::endl;
+	}
 
     return shaderProgram;
 }
@@ -107,9 +112,9 @@ GLuint ShaderProgram::compileShader(const char* shaderSource, GLenum shaderType)
 }
 
 GLuint ShaderProgram::getProgram() {
-	return quadProgram;
+	return chunkProgram;
 }
 
 ShaderProgram::~ShaderProgram() {
-    glDeleteProgram(quadProgram);
+    glDeleteProgram(chunkProgram);
 }

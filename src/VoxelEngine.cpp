@@ -42,11 +42,17 @@ VoxelEngine::VoxelEngine()
 
     // Enable depth testing
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE); //more optimized
+	glDisable(GL_CULL_FACE); //for testing purposes only
     glEnable(GL_BLEND);
 
 	// Initialize components
 	onInit();
+
+
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		std::cerr << "OpenGL error: " << err << std::endl;
+	}
 }
 
 VoxelEngine::~VoxelEngine()

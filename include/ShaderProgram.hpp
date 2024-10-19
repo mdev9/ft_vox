@@ -23,7 +23,7 @@ public:
 private:
 	VoxelEngine* engine;
 	Player *player;
-    GLuint quadProgram;
+    GLuint chunkProgram;
     glm::mat4 m_proj;
     glm::mat4 m_view;
 

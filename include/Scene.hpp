@@ -2,22 +2,22 @@
 #define SCENE_HPP
 
 #include <vector>
-#include "QuadMesh.hpp"
+#include "Chunk.hpp"
 #include "VoxelEngine.hpp"
+
+class Chunk;
 
 class VoxelEngine;
 
 class Scene {
 	public:
 		Scene(VoxelEngine* engine);
-		~Scene();
 
-		void addMesh(BaseMesh* mesh);
 		void update();
 		void render();
 
 	private:
-		std::vector<BaseMesh*> meshes;
+		Chunk* chunk;
 };
 
 #endif

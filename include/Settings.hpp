@@ -5,8 +5,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
 
-//Resolution
+// Resolution
 const glm::vec2 WIN_RES(1600, 900);
+
+// Chunk
+const int CHUNK_SIZE = 32;
+const int H_CHUNK_SIZE = CHUNK_SIZE / 2;
+const int CHUNK_AREA = CHUNK_SIZE * CHUNK_SIZE;
+const int CHUNK_VOL = CHUNK_AREA * CHUNK_SIZE;
 
 // Camera settings
 const float ASPECT_RATIO = WIN_RES.x / WIN_RES.y;
@@ -19,13 +25,13 @@ const float PITCH_MAX = glm::radians(89.0f);
 // Player settings
 const float PLAYER_SPEED = 5.0f;
 const float PLAYER_ROT_SPEED = 0.003f;
-const glm::vec3 PLAYER_POS(0.0f, 0.0f, 1.0f);
+const glm::vec3 PLAYER_POS(H_CHUNK_SIZE, CHUNK_SIZE, 1.5 * CHUNK_SIZE);
 const float MOUSE_SENSITIVITY = 0.002f;
 
-//Colors
+// Colors
 const glm::vec3 BG_COLOR(0.1f, 0.16f, 0.25f);
 
-//Icon
+// Icon
 const std::string ICON = "assets/grass_side.png";
 
 #endif
