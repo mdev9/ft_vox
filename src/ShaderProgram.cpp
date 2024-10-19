@@ -10,26 +10,26 @@ ShaderProgram::ShaderProgram(Player* player)
 	
     // Load and compile shaders, then link into a program
     chunkProgram = loadProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
-
     // Set initial uniforms
     setUniformsOnInit();
 }
 
 void ShaderProgram::setUniformsOnInit() {
 	m_proj = player->m_proj;
-
     glUseProgram(chunkProgram);
+
     // Set the projection matrix (m_proj)
     glUniformMatrix4fv(glGetUniformLocation(chunkProgram, "m_proj"), 1, GL_FALSE, glm::value_ptr(m_proj));
     // Set the model matrix (m_model)
     glUniformMatrix4fv(glGetUniformLocation(chunkProgram, "m_model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
-	//std::cout << "Projection matrix:\n" << glm::to_string(m_proj) << std::endl;
+	// Set texture uniform
+    glUniform1i(glGetUniformLocation(chunkProgram, "u_texture_0"), 0);
 }
 
 void ShaderProgram::update() {
 	m_view = player->m_view;
-
     glUseProgram(chunkProgram);
+
     // Update the view matrix (m_view)
     glUniformMatrix4fv(glGetUniformLocation(chunkProgram, "m_view"), 1, GL_FALSE, glm::value_ptr(m_view));
 }

@@ -6,6 +6,7 @@
 #include "Settings.hpp"
 #include "Player.hpp"
 #include "ShaderProgram.hpp"
+#include "Textures.hpp"
 #include "Scene.hpp"
 #include <iostream>
 
@@ -15,6 +16,7 @@ class VoxelEngine {
 	public:
 		GLFWwindow* window;
 		Player* player;
+		Textures* texture;
 		ShaderProgram* shaderProgram;
 		Scene* scene;
 		float deltaTime = 0.0f;
