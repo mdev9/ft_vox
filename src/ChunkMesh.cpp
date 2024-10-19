@@ -1,5 +1,6 @@
 #include "ChunkMesh.hpp"
 #include "chunk_mesh_builder.hpp"
+#include <cstdint>
 
 ChunkMesh::ChunkMesh(Chunk* chunk) : BaseMesh(), chunk(chunk) {
     program = chunk->getEngine()->shaderProgram->getProgram();
@@ -54,7 +55,7 @@ GLuint ChunkMesh::createVAO() {
 	// Create and bind the VBO
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, vertexData.size(), vertexData.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(uint8_t), vertexData.data(), GL_STATIC_DRAW);
 
 	GLint bufferSize = 0;
 	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize);
@@ -68,11 +69,11 @@ GLuint ChunkMesh::createVAO() {
 
 	// Attribute 1: Voxel ID (1 uint8)
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 1, GL_UNSIGNED_BYTE, GL_FALSE, formatSize * sizeof(uint8_t), (void*)(3 * sizeof(uint8_t)));
+	glVertexAttribIPointer(1, 1, GL_UNSIGNED_BYTE, formatSize * sizeof(uint8_t), (void*)(3 * sizeof(uint8_t)));
 
 	// Attribute 2: Face ID (1 uint8)
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 1, GL_UNSIGNED_BYTE, GL_FALSE, formatSize * sizeof(uint8_t), (void*)(4 * sizeof(uint8_t)));
+	glVertexAttribIPointer(2, 1, GL_UNSIGNED_BYTE, formatSize * sizeof(uint8_t), (void*)(4 * sizeof(uint8_t)));
 
 	// Unbind the VAO
 	glBindVertexArray(0);
