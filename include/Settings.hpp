@@ -14,6 +14,17 @@ const int H_CHUNK_SIZE = CHUNK_SIZE / 2;
 const int CHUNK_AREA = CHUNK_SIZE * CHUNK_SIZE;
 const int CHUNK_VOL = CHUNK_AREA * CHUNK_SIZE;
 
+// World
+const int WORLD_W = 20;
+const int WORLD_H = 4;
+const int WORLD_D = WORLD_W;
+const int WORLD_AREA = WORLD_W * WORLD_D;
+const int WORLD_VOL = WORLD_AREA * WORLD_H;
+
+// World Center
+const int CENTER_XZ = WORLD_W * H_CHUNK_SIZE;
+const int CENTER_Y = WORLD_H * H_CHUNK_SIZE;
+
 // Camera settings
 const float ASPECT_RATIO = WIN_RES.x / WIN_RES.y;
 const float FOV_DEG = 50.0f;
@@ -25,7 +36,7 @@ const float PITCH_MAX = glm::radians(89.0f);
 // Player settings
 const float PLAYER_SPEED = 5.0f;
 const float PLAYER_ROT_SPEED = 0.003f;
-const glm::vec3 PLAYER_POS(H_CHUNK_SIZE, CHUNK_SIZE, 1.5 * CHUNK_SIZE);
+const glm::vec3 PLAYER_POS(CENTER_XZ, WORLD_H * CHUNK_SIZE, CENTER_XZ);
 const float MOUSE_SENSITIVITY = 0.002f;
 
 // Colors

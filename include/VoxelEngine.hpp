@@ -9,6 +9,7 @@
 #include "Textures.hpp"
 #include "Scene.hpp"
 #include <iostream>
+#include <chrono>
 
 class Scene;
 

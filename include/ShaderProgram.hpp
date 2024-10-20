@@ -19,6 +19,8 @@ public:
     void setUniformsOnInit();
     void update();
 
+	GLint m_modelLoc;
+
 
 private:
 	VoxelEngine* engine;

@@ -20,8 +20,12 @@ void ShaderProgram::setUniformsOnInit() {
 
     // Set the projection matrix (m_proj)
     glUniformMatrix4fv(glGetUniformLocation(chunkProgram, "m_proj"), 1, GL_FALSE, glm::value_ptr(m_proj));
-    // Set the model matrix (m_model)
-    glUniformMatrix4fv(glGetUniformLocation(chunkProgram, "m_model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+
+    // Cache the model matrix location
+    m_modelLoc = glGetUniformLocation(chunkProgram, "m_model");
+    // Set a default model matrix (identity matrix)
+    glUniformMatrix4fv(m_modelLoc, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+
 	// Set texture uniform
     glUniform1i(glGetUniformLocation(chunkProgram, "u_texture_0"), 0);
 }

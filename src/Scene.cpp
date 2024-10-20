@@ -1,14 +1,14 @@
 #include "Scene.hpp"
 
 Scene::Scene(VoxelEngine* engine) {
-    chunk = new Chunk(engine);
+    world = new World(engine);
 }
 
 void Scene::update() {
-    // Update logic for your scene
+	world->update();
 	return ;
 }
 
 void Scene::render() {
-	chunk->render();
+	world->render();
 }

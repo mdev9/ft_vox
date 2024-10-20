@@ -3,29 +3,35 @@
 
 #include "Settings.hpp"
 #include "ChunkMesh.hpp"
-#include "VoxelEngine.hpp"
+#include "World.hpp"
 #include <vector>
+
+class World;
 
 class ChunkMesh;
 
-class VoxelEngine;
-
 class Chunk {
-public:
-    Chunk(VoxelEngine* engine);
-	~Chunk();
+	public:
+		Chunk(World* world, const glm::ivec3& position);
+		~Chunk();
 
-    void buildMesh();
-    void render();
-    std::vector<uint8_t> buildVoxels();
+		void buildMesh();
+		void render();
+		void setUniform();
 
-    const std::vector<uint8_t>& getVoxels() const { return voxels; }
-	VoxelEngine* getEngine();
+		World* getWorld();
+		std::vector<uint8_t>& getVoxels();
 
-private:
-    VoxelEngine* engine;
-    std::vector<uint8_t> voxels;
-    ChunkMesh* mesh;
+	private:
+		World* world;
+		glm::ivec3 position;
+		glm::mat4 m_model;
+		std::vector<uint8_t> voxels;
+		ChunkMesh* mesh;
+		bool is_empty;
+
+		glm::mat4 getModelMatrix();
+		std::vector<uint8_t> buildVoxels();
 };
 
 #endif

@@ -3,7 +3,7 @@
 #include <cstdint>
 
 ChunkMesh::ChunkMesh(Chunk* chunk) : BaseMesh(), chunk(chunk) {
-    program = chunk->getEngine()->shaderProgram->getProgram();
+    program = chunk->getWorld()->getEngine()->shaderProgram->getProgram();
 	// 3 floats for position, 1 uint8 for voxel_id, 1 uint8 for face_id
 	vboFormat = {"3u1", "1u1", "1u1"};
 	formatSize = calculateFormatSize(vboFormat);

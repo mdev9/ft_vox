@@ -2,10 +2,10 @@
 #define SCENE_HPP
 
 #include <vector>
-#include "Chunk.hpp"
+#include "World.hpp"
 #include "VoxelEngine.hpp"
 
-class Chunk;
+class World;
 
 class VoxelEngine;
 
@@ -17,7 +17,7 @@ class Scene {
 		void render();
 
 	private:
-		Chunk* chunk;
+		World* world;
 };
 
 #endif
