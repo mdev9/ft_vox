@@ -31,23 +31,11 @@ std::vector<uint8_t> build_chunk_mesh(const std::vector<uint8_t>& chunk_voxels, 
     std::vector<uint8_t> vertexData(CHUNK_VOL * 18 * format_size);
     int index = 0;
 
-	/*
-	std::cout << "Chunk Voxel Data:\n";
-	for (unsigned int i = 0; i < chunk_voxels.size(); ++i) {
-		std::cout << static_cast<int>(chunk_voxels[i]) << " ";
-	}
-	std::cout << std::endl;
-	*/
-
     for (int x = 0; x < CHUNK_SIZE; ++x) {
         for (int y = 0; y < CHUNK_SIZE; ++y) {
             for (int z = 0; z < CHUNK_SIZE; ++z) {
                 int voxelID = chunk_voxels[x + CHUNK_SIZE * z + CHUNK_AREA * y];
-                if (!voxelID)
-				{
-					std::cout << "no voxel at " << x << ", " << z << ", " << y << std::endl;
-					continue;
-				}
+                if (!voxelID) continue;
 
                 // Top face
                 if (is_void({x, y + 1, z}, chunk_voxels)) {
