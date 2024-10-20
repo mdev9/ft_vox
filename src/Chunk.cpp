@@ -74,3 +74,7 @@ World* Chunk::getWorld() {
 std::vector<uint8_t>& Chunk::getVoxels() {
 	return voxels;
 }
+
+glm::ivec3 Chunk::getPosition() {
+	return position;
+}

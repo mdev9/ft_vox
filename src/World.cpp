@@ -65,6 +65,10 @@ VoxelEngine* World::getEngine() {
 	return engine;
 }
 
+std::vector<uint8_t> World::getVoxels() {
+	return voxels;
+}
+
 World::~World() {
     for (auto chunk : chunks) {
         delete chunk;

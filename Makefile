@@ -3,7 +3,7 @@ CFLAGS = -std=c++11 -g -Wextra -Werror -Wall -Iinclude -Ilib/stb -Ilib/glm
 LDFLAGS = -lglfw -lGL -lGLEW -lm
 
 SRC_DIR = src
-OBJ_DIR = obj
+OBJ_DIR = /tmp/obj
 BIN_DIR = .
 INC_DIR = include
 

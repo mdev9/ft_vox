@@ -20,6 +20,7 @@ class World {
 		void render();
 
 		VoxelEngine* getEngine();
+		std::vector<uint8_t> getVoxels();
 
 	private:
 		VoxelEngine* engine;

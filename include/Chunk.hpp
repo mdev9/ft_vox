@@ -21,6 +21,7 @@ class Chunk {
 
 		World* getWorld();
 		std::vector<uint8_t>& getVoxels();
+		glm::ivec3 getPosition();
 
 	private:
 		World* world;

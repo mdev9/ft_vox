@@ -12,7 +12,7 @@ ChunkMesh::ChunkMesh(Chunk* chunk) : BaseMesh(), chunk(chunk) {
 }
 
 std::vector<uint8_t> ChunkMesh::getVertexData() {
-    return build_chunk_mesh(chunk->getVoxels(), formatSize);
+    return build_chunk_mesh(chunk->getVoxels(), formatSize, chunk->getPosition(), chunk->getWorld()->getVoxels());
 }
 
 void ChunkMesh::render() {
