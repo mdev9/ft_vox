@@ -15,8 +15,8 @@ const int CHUNK_AREA = CHUNK_SIZE * CHUNK_SIZE;
 const int CHUNK_VOL = CHUNK_AREA * CHUNK_SIZE;
 
 // World
-const int WORLD_W = 40;
-const int WORLD_H = 3;
+const int WORLD_W = 10;
+const int WORLD_H = 2;
 const int WORLD_D = WORLD_W;
 const int WORLD_AREA = WORLD_W * WORLD_D;
 const int WORLD_VOL = WORLD_AREA * WORLD_H;
