@@ -12,6 +12,13 @@ void Player::update() {
     Camera::update();
 }
 
+void Player::scrollControl(double yoffset) {
+	if (yoffset > 0)
+		setSpeed(PLAYER_SPEED + SPEED_ADJUSTMENT_AMOUNT);
+	else if (yoffset < 0)
+		setSpeed(PLAYER_SPEED - SPEED_ADJUSTMENT_AMOUNT);
+}
+
 void Player::mouseControl() {
     double mouseX, mouseY;
 
@@ -28,7 +35,7 @@ void Player::mouseControl() {
 }
 
 void Player::keyboardControl() {
-    float velocity = PLAYER_SPEED * engine->deltaTime; 
+    float velocity = playerSpeed * engine->deltaTime; 
 
     if (glfwGetKey(engine->window, GLFW_KEY_W) == GLFW_PRESS)
         moveForward(velocity);
@@ -37,11 +44,13 @@ void Player::keyboardControl() {
     if (glfwGetKey(engine->window, GLFW_KEY_D) == GLFW_PRESS)
         moveRight(velocity);
     if (glfwGetKey(engine->window, GLFW_KEY_A) == GLFW_PRESS)
-        moveLeft(velocity);
-    if (glfwGetKey(engine->window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        move(glm::vec3(0, 1, 0), velocity);
-    if (glfwGetKey(engine->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        move(glm::vec3(0, -1, 0), velocity);
+		moveLeft(velocity);
+	if (glfwGetKey(engine->window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		move(glm::vec3(0, 1, 0), velocity);
+	if (glfwGetKey(engine->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		move(glm::vec3(0, -1, 0), velocity);
+	if (glfwGetKey(engine->window, GLFW_KEY_F) == GLFW_PRESS)
+		toggleSpeedMultiplier();
 }
 
 void Player::moveForward(float velocity) {

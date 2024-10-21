@@ -23,23 +23,21 @@ World::World(VoxelEngine* engine) : engine(engine) {
 }
 
 void World::buildChunks() {
+	voxels.resize(WORLD_W * WORLD_H * WORLD_D);
+
     for (int x = 0; x < WORLD_W; ++x) {
         for (int y = 0; y < WORLD_H; ++y) {
             for (int z = 0; z < WORLD_D; ++z) {
-                // Declare position using glm::ivec3
-                glm::ivec3 position(x, y, z); // Correctly initialize position
-
-                // Create the Chunk instance using the initialized position
+                glm::ivec3 position(x, y, z);
                 Chunk* chunk = new Chunk(this, position);
-
                 int chunk_index = x + WORLD_W * z + WORLD_AREA * y;
                 this->chunks[chunk_index] = chunk;
 
                 // Build the chunk's voxels
                 std::vector<uint8_t> chunkVoxels = chunk->getVoxels();
 
-                // Insert the chunk voxels into the main voxels vector
-                voxels.insert(voxels.end(), chunkVoxels.begin(), chunkVoxels.end());
+                // Store chunk voxels in world_voxels
+                voxels[chunk_index] = chunkVoxels;
             }
         }
     }
@@ -65,7 +63,7 @@ VoxelEngine* World::getEngine() {
 	return engine;
 }
 
-std::vector<uint8_t> World::getVoxels() {
+std::vector<std::vector<uint8_t>> World::getVoxels() {
 	return voxels;
 }
 

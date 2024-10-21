@@ -1,4 +1,5 @@
 #include "Camera.hpp"
+#include "Settings.hpp"
 
 Camera::Camera(const glm::vec3& position, float yaw, float pitch) : 
 	position(position), yaw(glm::radians(yaw)), pitch(glm::radians(pitch)),
@@ -40,4 +41,15 @@ void Camera::rotateYaw(float delta_x) {
 
 void Camera::move(const glm::vec3& direction, float velocity) {
 	position += direction * velocity;
+}
+
+void Camera::toggleSpeedMultiplier() {
+	if (speedMultiplier == 1.0f)
+		speedMultiplier = 20.0f;
+	else
+		speedMultiplier = 1.0f;
+}
+
+void Camera::setSpeed(float speed) {
+	playerSpeed = speed * speedMultiplier;
 }

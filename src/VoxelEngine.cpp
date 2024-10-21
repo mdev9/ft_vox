@@ -58,12 +58,24 @@ VoxelEngine::~VoxelEngine()
     glfwTerminate();
 }
 
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+	(void) xoffset;
+    Player* player = static_cast<Player*>(glfwGetWindowUserPointer(window));
+    if (player)
+        player->scrollControl(yoffset);
+}
+
 void VoxelEngine::onInit()
 {
 	texture = new Textures();
     player = new Player(this);
     shaderProgram = new ShaderProgram(player);
     scene = new Scene(this);
+
+    glfwSetWindowUserPointer(window, player);
+    
+    // Register the scroll callback
+    glfwSetScrollCallback(window, scroll_callback);
 }
 
 void VoxelEngine::update()

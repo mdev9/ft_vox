@@ -57,7 +57,7 @@ GLuint ChunkMesh::createVAO() {
 	GLint bufferSize = 0;
 	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize);
 	if (bufferSize == 0) {
-		std::cerr << "VBO is empty!" << std::endl;
+		return 0; //to optimize?
 	}
 
 	// Attribute 0: Position (3 uint8)

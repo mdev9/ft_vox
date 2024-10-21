@@ -13,6 +13,7 @@ public:
     void update();
     void mouseControl();
     void keyboardControl();
+	void scrollControl(double yoffset);
 
 	void moveForward(float velocity);
 	void moveBack(float velocity);

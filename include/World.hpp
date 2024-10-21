@@ -20,12 +20,12 @@ class World {
 		void render();
 
 		VoxelEngine* getEngine();
-		std::vector<uint8_t> getVoxels();
+		std::vector<std::vector<uint8_t>> getVoxels();
 
 	private:
 		VoxelEngine* engine;
 		std::vector<Chunk*> chunks;
-		std::vector<uint8_t> voxels;
+		std::vector<std::vector<uint8_t>> voxels;
 };
 
 #endif
