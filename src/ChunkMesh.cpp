@@ -5,9 +5,9 @@
 ChunkMesh::ChunkMesh(Chunk* chunk) : BaseMesh(), chunk(chunk) {
     program = chunk->getWorld()->getEngine()->shaderProgram->getProgram();
 	// 3 floats for position, 1 uint8 for voxel_id, 1 uint8 for face_id
-	vboFormat = {"3u1", "1u1", "1u1"};
+	vboFormat = {"3u1", "1u1", "1u1", "1u1"};
 	formatSize = calculateFormatSize(vboFormat);
-	attrs = {"in_position", "voxel_id", "face_id"};
+	attrs = {"in_position", "voxel_id", "face_id", "ao_id"};
 	vao = createVAO();
 }
 
