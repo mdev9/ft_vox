@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <cstring>
+#include <array>
 #include <iostream>
 #include "Settings.hpp"
 

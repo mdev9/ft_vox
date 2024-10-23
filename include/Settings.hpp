@@ -6,7 +6,7 @@
 #include <string>
 
 // Resolution
-const glm::vec2 WIN_RES(1600, 900);
+const glm::vec2 DEFAULT_WIN_RES(1600, 900);
 
 // Chunk
 const int CHUNK_SIZE = 32;
@@ -26,7 +26,7 @@ const int CENTER_XZ = WORLD_W * H_CHUNK_SIZE;
 const int CENTER_Y = WORLD_H * H_CHUNK_SIZE;
 
 // Camera settings
-const float ASPECT_RATIO = WIN_RES.x / WIN_RES.y;
+const float DEFAULT_ASPECT_RATIO = DEFAULT_WIN_RES.x / DEFAULT_WIN_RES.y;
 const float FOV_DEG = 50.0f;
 const float V_FOV = glm::radians(FOV_DEG);
 const float NEAR = 0.1f;

@@ -21,12 +21,14 @@ void Player::scrollControl(double yoffset) {
 
 void Player::mouseControl() {
     double mouseX, mouseY;
+    int windowWidth, windowHeight;
 
+    glfwGetWindowSize(engine->window, &windowWidth, &windowHeight);
     glfwGetCursorPos(engine->window, &mouseX, &mouseY);
-    glfwSetCursorPos(engine->window, WIN_RES.x / 2, WIN_RES.y / 2); // Reset mouse to center of screen
+    glfwSetCursorPos(engine->window, windowWidth / 2.0, windowHeight / 2.0);
 
-    float deltaX = static_cast<float>(mouseX - WIN_RES.x / 2);
-    float deltaY = static_cast<float>(mouseY - WIN_RES.y / 2);
+    float deltaX = static_cast<float>(mouseX - windowWidth / 2.0);
+    float deltaY = static_cast<float>(mouseY - windowHeight / 2.0);
 
     if (deltaX != 0)
         rotateYaw(deltaX * MOUSE_SENSITIVITY);

@@ -5,7 +5,7 @@ Camera::Camera(const glm::vec3& position, float yaw, float pitch) :
 	position(position), yaw(glm::radians(yaw)), pitch(glm::radians(pitch)),
 	up(glm::vec3(0, 1, 0)), forward(glm::vec3(0, 0, -1)), right(glm::vec3(1, 0, 0)) {
 
-	m_proj = glm::perspective(V_FOV, ASPECT_RATIO, NEAR, FAR);
+	m_proj = glm::perspective(V_FOV, DEFAULT_ASPECT_RATIO, NEAR, FAR);
 	m_view = glm::mat4();
 
 	update();
@@ -52,4 +52,8 @@ void Camera::toggleSpeedMultiplier() {
 
 void Camera::setSpeed(float speed) {
 	playerSpeed = speed * speedMultiplier;
+}
+
+void Camera::setAspectRatio(float aspectRatio) {
+    m_proj = glm::perspective(V_FOV, aspectRatio, NEAR, FAR);
 }

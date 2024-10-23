@@ -21,6 +21,7 @@ class Camera {
 		void move(const glm::vec3& direction, float velocity);
 		void toggleSpeedMultiplier();
 		void setSpeed(float speed);
+		void setAspectRatio(float aspectRatio);
 
 	protected:
 		float speedMultiplier = 1.0f;

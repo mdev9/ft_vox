@@ -31,10 +31,15 @@ class VoxelEngine {
 		void update();
 		void render();
 		void handleEvents();
+		void toggleFullscreen();
 
 	private:
 		glm::mat4 proj;
 		glm::mat4 view;
+
+		bool isFullscreen = false;
+		int windowedPosX, windowedPosY;
+		glm::vec2 WIN_RES;
 
 		void onInit();
 		void initGlfw();

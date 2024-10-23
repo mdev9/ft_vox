@@ -1,4 +1,5 @@
 #include "VoxelEngine.hpp"
+#include "Settings.hpp"
 #include <cstdlib>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -14,6 +15,7 @@ VoxelEngine::VoxelEngine()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+	WIN_RES = DEFAULT_WIN_RES;
     window = glfwCreateWindow(WIN_RES.x, WIN_RES.y, "", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window!" << std::endl;
@@ -65,6 +67,25 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
         player->scrollControl(yoffset);
 }
 
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	(void) scancode, (void) mods;
+    VoxelEngine* engine = static_cast<VoxelEngine*>(glfwGetWindowUserPointer(window));
+    if (engine && key == GLFW_KEY_F11 && action == GLFW_PRESS) {
+        engine->toggleFullscreen();
+    }
+}
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
+    
+    // Get the camera from the window user pointer
+    VoxelEngine* engine = static_cast<VoxelEngine*>(glfwGetWindowUserPointer(window));
+    if (engine && engine->player) {
+        float aspectRatio = static_cast<float>(width) / height;
+        engine->player->setAspectRatio(aspectRatio);
+    }
+}
+
 void VoxelEngine::onInit()
 {
 	texture = new Textures();
@@ -72,10 +93,36 @@ void VoxelEngine::onInit()
     shaderProgram = new ShaderProgram(player);
     scene = new Scene(this);
 
-    glfwSetWindowUserPointer(window, player);
+    glfwSetWindowUserPointer(window, this);
     
     // Register the scroll callback
     glfwSetScrollCallback(window, scroll_callback);
+
+	// Register the window callbacks
+    glfwSetKeyCallback(window, keyCallback);
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+}
+
+void VoxelEngine::toggleFullscreen() {
+    if (isFullscreen) {
+        glfwSetWindowMonitor(window, nullptr, windowedPosX, windowedPosY, WIN_RES.x, WIN_RES.y, 0);
+        isFullscreen = false;
+    } else {
+        GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
+        const GLFWvidmode* mode = glfwGetVideoMode(primaryMonitor);
+
+        glfwGetWindowPos(window, &windowedPosX, &windowedPosY);
+		int windowedWidth, windowedHeight;
+        glfwGetWindowSize(window, &windowedWidth, &windowedHeight);
+
+        WIN_RES = glm::vec2(windowedWidth, windowedHeight);
+
+        glfwSetWindowMonitor(window, primaryMonitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+        isFullscreen = true;
+    }
+
+    player->setAspectRatio(WIN_RES.x / WIN_RES.y);
+    glfwSwapInterval(1);
 }
 
 void VoxelEngine::update()
