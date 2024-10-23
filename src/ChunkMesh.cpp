@@ -4,10 +4,10 @@
 
 ChunkMesh::ChunkMesh(Chunk* chunk) : BaseMesh(), chunk(chunk) {
     program = chunk->getWorld()->getEngine()->shaderProgram->getProgram();
-	// 3 floats for position, 1 uint8 for voxel_id, 1 uint8 for face_id
-	vboFormat = {"3u1", "1u1", "1u1", "1u1"};
+	// 3 floats for position, 1 uint8 for voxel_id, 1 uint8 for face_id, 1 uint8 for ao_id, 1 uint8 for flip_id
+	vboFormat = {"3u1", "1u1", "1u1", "1u1", "1u1"};
 	formatSize = calculateFormatSize(vboFormat);
-	attrs = {"in_position", "voxel_id", "face_id", "ao_id"};
+	attrs = {"in_position", "voxel_id", "face_id", "ao_id", "flip_id"};
 	vao = createVAO();
 }
 
@@ -71,6 +71,14 @@ GLuint ChunkMesh::createVAO() {
 	// Attribute 2: Face ID (1 uint8)
 	glEnableVertexAttribArray(2);
 	glVertexAttribIPointer(2, 1, GL_UNSIGNED_BYTE, formatSize * sizeof(uint8_t), (void*)(4 * sizeof(uint8_t)));
+
+	// Attribute 3: AO ID (1 uint8)
+	glEnableVertexAttribArray(3);
+	glVertexAttribIPointer(3, 1, GL_UNSIGNED_BYTE, formatSize * sizeof(uint8_t), (void*)(5 * sizeof(uint8_t)));
+
+	// Attribute 4: Flip ID (1 uint8)
+	glEnableVertexAttribArray(4);
+	glVertexAttribIPointer(4, 1, GL_UNSIGNED_BYTE, formatSize * sizeof(uint8_t), (void*)(6 * sizeof(uint8_t)));
 
 	// Unbind the VAO
 	glBindVertexArray(0);

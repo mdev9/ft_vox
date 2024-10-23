@@ -137,6 +137,7 @@ std::vector<uint8_t> build_chunk_mesh(const std::vector<uint8_t>& chunk_voxels, 
     int index = 0;
 
     std::array<int, 4> ao;
+    int flip_id;
 
     for (int x = 0; x < CHUNK_SIZE; ++x) {
         for (int y = 0; y < CHUNK_SIZE; ++y) {
@@ -151,72 +152,97 @@ std::vector<uint8_t> build_chunk_mesh(const std::vector<uint8_t>& chunk_voxels, 
                 // Top face
                 if (is_void({x, y + 1, z}, {wx, wy + 1, wz}, world_voxels)) {
 					ao = get_ao({x, y + 1, z}, {wx, wy + 1, wz}, world_voxels, 'Y');
+					flip_id = ao[1] + ao[3] > ao[0] + ao[2];
 
-                    std::vector<int> v0 = {x    , y + 1, z    , voxelID, 0, ao[0]};
-                    std::vector<int> v1 = {x + 1, y + 1, z    , voxelID, 0, ao[1]};
-                    std::vector<int> v2 = {x + 1, y + 1, z + 1, voxelID, 0, ao[2]};
-                    std::vector<int> v3 = {x    , y + 1, z + 1, voxelID, 0, ao[3]};
+                    std::vector<int> v0 = {x    , y + 1, z    , voxelID, 0, ao[0], flip_id};
+                    std::vector<int> v1 = {x + 1, y + 1, z    , voxelID, 0, ao[1], flip_id};
+                    std::vector<int> v2 = {x + 1, y + 1, z + 1, voxelID, 0, ao[2], flip_id};
+                    std::vector<int> v3 = {x    , y + 1, z + 1, voxelID, 0, ao[3], flip_id};
 
-                    index = addData(vertexData, index, {v0, v3, v2, v0, v2, v1});
+					if (flip_id)
+						index = addData(vertexData, index, {v1, v0, v3, v1, v3, v2});
+					else
+						index = addData(vertexData, index, {v0, v3, v2, v0, v2, v1});
                 }
 
                 // Bottom face
                 if (is_void({x, y - 1, z}, {wx, wy - 1, wz}, world_voxels)) {
 					ao = get_ao({x, y - 1, z}, {wx, wy - 1, wz}, world_voxels, 'Y');
-                    std::vector<int> v0 = {x    , y, z    , voxelID, 1, ao[0]};
-                    std::vector<int> v1 = {x + 1, y, z    , voxelID, 1, ao[1]};
-                    std::vector<int> v2 = {x + 1, y, z + 1, voxelID, 1, ao[2]};
-                    std::vector<int> v3 = {x    , y, z + 1, voxelID, 1, ao[3]};
+					flip_id = ao[1] + ao[3] > ao[0] + ao[2];
 
-                    index = addData(vertexData, index, {v0, v2, v3, v0, v1, v2});
+                    std::vector<int> v0 = {x    , y, z    , voxelID, 1, ao[0], flip_id};
+                    std::vector<int> v1 = {x + 1, y, z    , voxelID, 1, ao[1], flip_id};
+                    std::vector<int> v2 = {x + 1, y, z + 1, voxelID, 1, ao[2], flip_id};
+                    std::vector<int> v3 = {x    , y, z + 1, voxelID, 1, ao[3], flip_id};
+
+					if (flip_id)
+						index = addData(vertexData, index, {v1, v3, v0, v1, v2, v3});
+					else
+						index = addData(vertexData, index, {v0, v2, v3, v0, v1, v2});
                 }
 
                 // Right face
                 if (is_void({x + 1, y, z}, {wx + 1, wy, wz}, world_voxels)) {
 					ao = get_ao({x + 1, y, z}, {wx + 1, wy, wz}, world_voxels, 'X');
+					flip_id = ao[1] + ao[3] > ao[0] + ao[2];
 
-                    std::vector<int> v0 = {x + 1, y    , z    , voxelID, 2, ao[0]};
-                    std::vector<int> v1 = {x + 1, y + 1, z    , voxelID, 2, ao[1]};
-                    std::vector<int> v2 = {x + 1, y + 1, z + 1, voxelID, 2, ao[2]};
-                    std::vector<int> v3 = {x + 1, y    , z + 1, voxelID, 2, ao[3]};
+                    std::vector<int> v0 = {x + 1, y    , z    , voxelID, 2, ao[0], flip_id};
+                    std::vector<int> v1 = {x + 1, y + 1, z    , voxelID, 2, ao[1], flip_id};
+                    std::vector<int> v2 = {x + 1, y + 1, z + 1, voxelID, 2, ao[2], flip_id};
+                    std::vector<int> v3 = {x + 1, y    , z + 1, voxelID, 2, ao[3], flip_id};
 
-                    index = addData(vertexData, index, {v0, v1, v2, v0, v2, v3});
+					if (flip_id)
+						index = addData(vertexData, index, {v3, v0, v1, v3, v1, v2});
+					else
+						index = addData(vertexData, index, {v0, v1, v2, v0, v2, v3});
                 }
 
                 // Left face
                 if (is_void({x - 1, y, z}, {wx - 1, wy, wz}, world_voxels)) {
 					ao = get_ao({x - 1, y, z}, {wx - 1, wy, wz}, world_voxels, 'X');
+					flip_id = ao[1] + ao[3] > ao[0] + ao[2];
 
-                    std::vector<int> v0 = {x, y    , z    , voxelID, 3, ao[0]};
-                    std::vector<int> v1 = {x, y + 1, z    , voxelID, 3, ao[1]};
-                    std::vector<int> v2 = {x, y + 1, z + 1, voxelID, 3, ao[2]};
-                    std::vector<int> v3 = {x, y    , z + 1, voxelID, 3, ao[3]};
+                    std::vector<int> v0 = {x, y    , z    , voxelID, 3, ao[0], flip_id};
+                    std::vector<int> v1 = {x, y + 1, z    , voxelID, 3, ao[1], flip_id};
+                    std::vector<int> v2 = {x, y + 1, z + 1, voxelID, 3, ao[2], flip_id};
+                    std::vector<int> v3 = {x, y    , z + 1, voxelID, 3, ao[3], flip_id};
 
-                    index = addData(vertexData, index, {v0, v2, v1, v0, v3, v2});
+					if (flip_id)
+						index = addData(vertexData, index, {v3, v1, v0, v3, v2, v1});
+					else
+						index = addData(vertexData, index, {v0, v2, v1, v0, v3, v2});
                 }
 
                 // Back face
                 if (is_void({x, y, z - 1}, {wx, wy, wz - 1}, world_voxels)) {
 					ao = get_ao({x, y, z -1}, {wx, wy, wz - 1}, world_voxels, 'Z');
+					flip_id = ao[1] + ao[3] > ao[0] + ao[2];
 
-                    std::vector<int> v0 = {x    , y    , z, voxelID, 4, ao[0]};
-                    std::vector<int> v1 = {x    , y + 1, z, voxelID, 4, ao[1]};
-                    std::vector<int> v2 = {x + 1, y + 1, z, voxelID, 4, ao[2]};
-                    std::vector<int> v3 = {x + 1, y    , z, voxelID, 4, ao[3]};
+                    std::vector<int> v0 = {x    , y    , z, voxelID, 4, ao[0], flip_id};
+                    std::vector<int> v1 = {x    , y + 1, z, voxelID, 4, ao[1], flip_id};
+                    std::vector<int> v2 = {x + 1, y + 1, z, voxelID, 4, ao[2], flip_id};
+                    std::vector<int> v3 = {x + 1, y    , z, voxelID, 4, ao[3], flip_id};
 
-                    index = addData(vertexData, index, {v0, v1, v2, v0, v2, v3});
+					if (flip_id)
+						index = addData(vertexData, index, {v3, v0, v1, v3, v1, v2});
+					else
+						index = addData(vertexData, index, {v0, v1, v2, v0, v2, v3});
                 }
 
                 // Front face
                 if (is_void({x, y, z + 1}, {wx, wy, wz + 1}, world_voxels)) {
 					ao = get_ao({x, y, z + 1}, {wx, wy, wz + 1}, world_voxels, 'Z');
+					flip_id = ao[1] + ao[3] > ao[0] + ao[2];
 
-                    std::vector<int> v0 = {x    , y    , z + 1, voxelID, 5, ao[0]};
-                    std::vector<int> v1 = {x    , y + 1, z + 1, voxelID, 5, ao[1]};
-                    std::vector<int> v2 = {x + 1, y + 1, z + 1, voxelID, 5, ao[2]};
-                    std::vector<int> v3 = {x + 1, y    , z + 1, voxelID, 5, ao[3]};
+                    std::vector<int> v0 = {x    , y    , z + 1, voxelID, 5, ao[0], flip_id};
+                    std::vector<int> v1 = {x    , y + 1, z + 1, voxelID, 5, ao[1], flip_id};
+                    std::vector<int> v2 = {x + 1, y + 1, z + 1, voxelID, 5, ao[2], flip_id};
+                    std::vector<int> v3 = {x + 1, y    , z + 1, voxelID, 5, ao[3], flip_id};
 
-                    index = addData(vertexData, index, {v0, v2, v1, v0, v3, v2});
+					if (flip_id)
+						index = addData(vertexData, index, {v3, v1, v0, v3, v2, v1});
+					else
+						index = addData(vertexData, index, {v0, v2, v1, v0, v3, v2});
                 }
             }
         }
