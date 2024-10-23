@@ -11,7 +11,7 @@ public:
     ChunkMesh(Chunk* chunk);
     ~ChunkMesh();
 
-    std::vector<uint8_t> getVertexData() override;
+    std::vector<uint32_t> getVertexData() override;
 	void render() override;
 
 private:

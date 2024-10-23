@@ -1,7 +1,30 @@
 #include "chunk_mesh_builder.hpp"
-#include <cstdint>
-#include <iostream>
 #include "Settings.hpp"
+
+uint32_t pack_data(int x, int y, int z, int voxel_id, int face_id, int ao_id, bool flip_id) {
+    // x: 6 bits, y: 6 bits, z: 6 bits
+    // voxel_id: 8 bits, face_id: 3 bits, ao_id: 2 bits, flip_id: 1 bit
+
+    uint8_t b_bit = 6, c_bit = 6, d_bit = 8, e_bit = 3, f_bit = 2, g_bit = 1;
+    
+    uint8_t fg_bit = f_bit + g_bit;        // 2 + 1 = 3
+    uint8_t efg_bit = e_bit + fg_bit;      // 3 + 3 = 6
+    uint8_t defg_bit = d_bit + efg_bit;    // 8 + 6 = 14
+    uint8_t cdefg_bit = c_bit + defg_bit;  // 6 + 14 = 20
+    uint8_t bcdefg_bit = b_bit + cdefg_bit; // 6 + 20 = 26
+
+    uint32_t packed_data = 0;
+
+    packed_data |= ((uint32_t)x << bcdefg_bit);
+    packed_data |= ((uint32_t)y << cdefg_bit);
+    packed_data |= ((uint32_t)z << defg_bit);
+    packed_data |= ((uint32_t)voxel_id << efg_bit);
+    packed_data |= ((uint32_t)face_id << fg_bit);
+    packed_data |= ((uint32_t)ao_id << g_bit);
+    packed_data |= (flip_id ? 1 : 0); // Flip_id is a bool, pack it as 1 or 0
+
+    return packed_data;
+}
 
 int get_chunk_index(const glm::ivec3& world_voxel_pos) {
 	int wx = world_voxel_pos.x;
@@ -75,13 +98,11 @@ bool is_void(const glm::ivec3& local_voxel_pos, const glm::ivec3& world_voxel_po
 	return chunk_voxels[voxel_index] == 0; // Return true if it's void
 }
 
-int addData(std::vector<uint8_t>& vertexData, int index, std::initializer_list<std::vector<int>> vertices) {
-	for (const auto& vertex : vertices) {
-		for (const auto& attr : vertex) {
-			vertexData[index++] = static_cast<uint8_t>(attr);
-		}
-	}
-	return index;
+int addData(std::vector<uint32_t>& vertexData, int index, std::initializer_list<uint32_t> vertices) {
+    for (const auto& vertex : vertices) {
+        vertexData[index++] = vertex;
+    }
+    return index;
 }
 
 std::array<int, 4> get_ao(const glm::ivec3& local_pos, const glm::ivec3& world_pos, const std::vector<std::vector<uint8_t>>& world_voxels, char plane) {
@@ -132,12 +153,12 @@ std::array<int, 4> get_ao(const glm::ivec3& local_pos, const glm::ivec3& world_p
     return ao;
 }
 
-std::vector<uint8_t> build_chunk_mesh(const std::vector<uint8_t>& chunk_voxels, int format_size, glm::ivec3 chunk_pos, const std::vector<std::vector<uint8_t>>& world_voxels) {
-    std::vector<uint8_t> vertexData(CHUNK_VOL * 18 * format_size);
+std::vector<uint32_t> build_chunk_mesh(const std::vector<uint8_t>& chunk_voxels, int format_size, glm::ivec3 chunk_pos, const std::vector<std::vector<uint8_t>>& world_voxels) {
+    std::vector<uint32_t> vertexData(CHUNK_VOL * 18 * format_size);
     int index = 0;
 
     std::array<int, 4> ao;
-    int flip_id;
+    bool flip_id;
 
     for (int x = 0; x < CHUNK_SIZE; ++x) {
         for (int y = 0; y < CHUNK_SIZE; ++y) {
@@ -154,10 +175,10 @@ std::vector<uint8_t> build_chunk_mesh(const std::vector<uint8_t>& chunk_voxels, 
 					ao = get_ao({x, y + 1, z}, {wx, wy + 1, wz}, world_voxels, 'Y');
 					flip_id = ao[1] + ao[3] > ao[0] + ao[2];
 
-                    std::vector<int> v0 = {x    , y + 1, z    , voxelID, 0, ao[0], flip_id};
-                    std::vector<int> v1 = {x + 1, y + 1, z    , voxelID, 0, ao[1], flip_id};
-                    std::vector<int> v2 = {x + 1, y + 1, z + 1, voxelID, 0, ao[2], flip_id};
-                    std::vector<int> v3 = {x    , y + 1, z + 1, voxelID, 0, ao[3], flip_id};
+                    uint32_t v0 = pack_data(x    , y + 1, z    , voxelID, 0, ao[0], flip_id);
+                    uint32_t v1 = pack_data(x + 1, y + 1, z    , voxelID, 0, ao[1], flip_id);
+                    uint32_t v2 = pack_data(x + 1, y + 1, z + 1, voxelID, 0, ao[2], flip_id);
+                    uint32_t v3 = pack_data(x    , y + 1, z + 1, voxelID, 0, ao[3], flip_id);
 
 					if (flip_id)
 						index = addData(vertexData, index, {v1, v0, v3, v1, v3, v2});
@@ -170,10 +191,10 @@ std::vector<uint8_t> build_chunk_mesh(const std::vector<uint8_t>& chunk_voxels, 
 					ao = get_ao({x, y - 1, z}, {wx, wy - 1, wz}, world_voxels, 'Y');
 					flip_id = ao[1] + ao[3] > ao[0] + ao[2];
 
-                    std::vector<int> v0 = {x    , y, z    , voxelID, 1, ao[0], flip_id};
-                    std::vector<int> v1 = {x + 1, y, z    , voxelID, 1, ao[1], flip_id};
-                    std::vector<int> v2 = {x + 1, y, z + 1, voxelID, 1, ao[2], flip_id};
-                    std::vector<int> v3 = {x    , y, z + 1, voxelID, 1, ao[3], flip_id};
+                    uint32_t v0 = pack_data(x    , y, z    , voxelID, 1, ao[0], flip_id);
+                    uint32_t v1 = pack_data(x + 1, y, z    , voxelID, 1, ao[1], flip_id);
+                    uint32_t v2 = pack_data(x + 1, y, z + 1, voxelID, 1, ao[2], flip_id);
+                    uint32_t v3 = pack_data(x    , y, z + 1, voxelID, 1, ao[3], flip_id);
 
 					if (flip_id)
 						index = addData(vertexData, index, {v1, v3, v0, v1, v2, v3});
@@ -186,10 +207,10 @@ std::vector<uint8_t> build_chunk_mesh(const std::vector<uint8_t>& chunk_voxels, 
 					ao = get_ao({x + 1, y, z}, {wx + 1, wy, wz}, world_voxels, 'X');
 					flip_id = ao[1] + ao[3] > ao[0] + ao[2];
 
-                    std::vector<int> v0 = {x + 1, y    , z    , voxelID, 2, ao[0], flip_id};
-                    std::vector<int> v1 = {x + 1, y + 1, z    , voxelID, 2, ao[1], flip_id};
-                    std::vector<int> v2 = {x + 1, y + 1, z + 1, voxelID, 2, ao[2], flip_id};
-                    std::vector<int> v3 = {x + 1, y    , z + 1, voxelID, 2, ao[3], flip_id};
+                    uint32_t v0 = pack_data(x + 1, y    , z    , voxelID, 2, ao[0], flip_id);
+                    uint32_t v1 = pack_data(x + 1, y + 1, z    , voxelID, 2, ao[1], flip_id);
+                    uint32_t v2 = pack_data(x + 1, y + 1, z + 1, voxelID, 2, ao[2], flip_id);
+                    uint32_t v3 = pack_data(x + 1, y    , z + 1, voxelID, 2, ao[3], flip_id);
 
 					if (flip_id)
 						index = addData(vertexData, index, {v3, v0, v1, v3, v1, v2});
@@ -202,10 +223,10 @@ std::vector<uint8_t> build_chunk_mesh(const std::vector<uint8_t>& chunk_voxels, 
 					ao = get_ao({x - 1, y, z}, {wx - 1, wy, wz}, world_voxels, 'X');
 					flip_id = ao[1] + ao[3] > ao[0] + ao[2];
 
-                    std::vector<int> v0 = {x, y    , z    , voxelID, 3, ao[0], flip_id};
-                    std::vector<int> v1 = {x, y + 1, z    , voxelID, 3, ao[1], flip_id};
-                    std::vector<int> v2 = {x, y + 1, z + 1, voxelID, 3, ao[2], flip_id};
-                    std::vector<int> v3 = {x, y    , z + 1, voxelID, 3, ao[3], flip_id};
+                    uint32_t v0 = pack_data(x, y    , z    , voxelID, 3, ao[0], flip_id);
+                    uint32_t v1 = pack_data(x, y + 1, z    , voxelID, 3, ao[1], flip_id);
+                    uint32_t v2 = pack_data(x, y + 1, z + 1, voxelID, 3, ao[2], flip_id);
+                    uint32_t v3 = pack_data(x, y    , z + 1, voxelID, 3, ao[3], flip_id);
 
 					if (flip_id)
 						index = addData(vertexData, index, {v3, v1, v0, v3, v2, v1});
@@ -218,10 +239,10 @@ std::vector<uint8_t> build_chunk_mesh(const std::vector<uint8_t>& chunk_voxels, 
 					ao = get_ao({x, y, z -1}, {wx, wy, wz - 1}, world_voxels, 'Z');
 					flip_id = ao[1] + ao[3] > ao[0] + ao[2];
 
-                    std::vector<int> v0 = {x    , y    , z, voxelID, 4, ao[0], flip_id};
-                    std::vector<int> v1 = {x    , y + 1, z, voxelID, 4, ao[1], flip_id};
-                    std::vector<int> v2 = {x + 1, y + 1, z, voxelID, 4, ao[2], flip_id};
-                    std::vector<int> v3 = {x + 1, y    , z, voxelID, 4, ao[3], flip_id};
+                    uint32_t v0 = pack_data(x    , y    , z, voxelID, 4, ao[0], flip_id);
+                    uint32_t v1 = pack_data(x    , y + 1, z, voxelID, 4, ao[1], flip_id);
+                    uint32_t v2 = pack_data(x + 1, y + 1, z, voxelID, 4, ao[2], flip_id);
+                    uint32_t v3 = pack_data(x + 1, y    , z, voxelID, 4, ao[3], flip_id);
 
 					if (flip_id)
 						index = addData(vertexData, index, {v3, v0, v1, v3, v1, v2});
@@ -234,10 +255,10 @@ std::vector<uint8_t> build_chunk_mesh(const std::vector<uint8_t>& chunk_voxels, 
 					ao = get_ao({x, y, z + 1}, {wx, wy, wz + 1}, world_voxels, 'Z');
 					flip_id = ao[1] + ao[3] > ao[0] + ao[2];
 
-                    std::vector<int> v0 = {x    , y    , z + 1, voxelID, 5, ao[0], flip_id};
-                    std::vector<int> v1 = {x    , y + 1, z + 1, voxelID, 5, ao[1], flip_id};
-                    std::vector<int> v2 = {x + 1, y + 1, z + 1, voxelID, 5, ao[2], flip_id};
-                    std::vector<int> v3 = {x + 1, y    , z + 1, voxelID, 5, ao[3], flip_id};
+                    uint32_t v0 = pack_data(x    , y    , z + 1, voxelID, 5, ao[0], flip_id);
+                    uint32_t v1 = pack_data(x    , y + 1, z + 1, voxelID, 5, ao[1], flip_id);
+                    uint32_t v2 = pack_data(x + 1, y + 1, z + 1, voxelID, 5, ao[2], flip_id);
+                    uint32_t v3 = pack_data(x + 1, y    , z + 1, voxelID, 5, ao[3], flip_id);
 
 					if (flip_id)
 						index = addData(vertexData, index, {v3, v1, v0, v3, v2, v1});

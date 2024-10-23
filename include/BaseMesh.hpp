@@ -7,7 +7,7 @@ public:
     BaseMesh();
     virtual ~BaseMesh();
 
-    virtual std::vector<uint8_t> getVertexData() = 0;
+    virtual std::vector<uint32_t> getVertexData() = 0;
 	virtual void render() = 0;
 
     GLuint getVAO();

@@ -4,14 +4,13 @@
 
 ChunkMesh::ChunkMesh(Chunk* chunk) : BaseMesh(), chunk(chunk) {
     program = chunk->getWorld()->getEngine()->shaderProgram->getProgram();
-	// 3 floats for position, 1 uint8 for voxel_id, 1 uint8 for face_id, 1 uint8 for ao_id, 1 uint8 for flip_id
-	vboFormat = {"3u1", "1u1", "1u1", "1u1", "1u1"};
+	vboFormat = {"1u4"};
 	formatSize = calculateFormatSize(vboFormat);
-	attrs = {"in_position", "voxel_id", "face_id", "ao_id", "flip_id"};
+	attrs = {"packed_data"};
 	vao = createVAO();
 }
 
-std::vector<uint8_t> ChunkMesh::getVertexData() {
+std::vector<uint32_t> ChunkMesh::getVertexData() {
     return build_chunk_mesh(chunk->getVoxels(), formatSize, chunk->getPosition(), chunk->getWorld()->getVoxels());
 }
 
@@ -46,13 +45,13 @@ GLuint ChunkMesh::createVAO() {
 	glBindVertexArray(vaoID);
 
 	// Get the vertex data for the chunk
-	std::vector<uint8_t> vertexData = getVertexData();
+	std::vector<uint32_t> vertexData = getVertexData();
 	vertexCount = vertexData.size() / formatSize;
 
 	// Create and bind the VBO
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(uint8_t), vertexData.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(uint32_t), vertexData.data(), GL_STATIC_DRAW);
 
 	GLint bufferSize = 0;
 	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize);
@@ -60,10 +59,11 @@ GLuint ChunkMesh::createVAO() {
 		return 0; //to optimize?
 	}
 
-	// Attribute 0: Position (3 uint8)
+	// Attribute 0: Position (1 uint32)
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_UNSIGNED_BYTE, GL_FALSE, formatSize * sizeof(uint8_t), (void*)0);
+	glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, formatSize * sizeof(uint32_t), (void*)0);
 
+	/*
 	// Attribute 1: Voxel ID (1 uint8)
 	glEnableVertexAttribArray(1);
 	glVertexAttribIPointer(1, 1, GL_UNSIGNED_BYTE, formatSize * sizeof(uint8_t), (void*)(3 * sizeof(uint8_t)));
@@ -79,6 +79,7 @@ GLuint ChunkMesh::createVAO() {
 	// Attribute 4: Flip ID (1 uint8)
 	glEnableVertexAttribArray(4);
 	glVertexAttribIPointer(4, 1, GL_UNSIGNED_BYTE, formatSize * sizeof(uint8_t), (void*)(6 * sizeof(uint8_t)));
+	*/
 
 	// Unbind the VAO
 	glBindVertexArray(0);
