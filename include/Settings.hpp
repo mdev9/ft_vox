@@ -8,6 +8,9 @@
 // Resolution
 const glm::vec2 DEFAULT_WIN_RES(1600, 900);
 
+// Ray Casting
+const float MAX_RAY_DIST = 6.0f;
+
 // Chunk
 const int CHUNK_SIZE = 32;
 const int H_CHUNK_SIZE = CHUNK_SIZE / 2;

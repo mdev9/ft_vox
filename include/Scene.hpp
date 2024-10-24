@@ -15,6 +15,7 @@ class Scene {
 
 		void update();
 		void render();
+		World* getWorld();
 
 	private:
 		World* world;

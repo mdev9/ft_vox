@@ -13,6 +13,7 @@ public:
 
     std::vector<uint32_t> getVertexData() override;
 	void render() override;
+	void rebuild();
 
 private:
     Chunk* chunk;

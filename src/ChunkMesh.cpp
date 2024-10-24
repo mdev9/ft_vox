@@ -10,6 +10,20 @@ ChunkMesh::ChunkMesh(Chunk* chunk) : BaseMesh(), chunk(chunk) {
 	vao = createVAO();
 }
 
+void ChunkMesh::rebuild() {
+	if (vao) {
+		glDeleteVertexArrays(1, &vao);
+		vao = 0;
+	}
+	if (vbo) {
+		glDeleteBuffers(1, &vbo);
+		vbo = 0;
+	}
+
+	// Generate new VAO
+	vao = createVAO();
+}
+
 std::vector<uint32_t> ChunkMesh::getVertexData() {
     return build_chunk_mesh(chunk->getVoxels(), formatSize, chunk->getPosition(), chunk->getWorld()->getVoxels());
 }
@@ -33,7 +47,7 @@ void ChunkMesh::render() {
 int ChunkMesh::calculateFormatSize(const std::vector<std::string>& format) {
 	int totalSize = 0;
 	for (const auto& fmt : format) {
-		totalSize += std::stoi(fmt.substr(0, 1));  // Get the integer part (3u1 -> 3)
+		totalSize += std::stoi(fmt.substr(0, 1));
 	}
 	return totalSize;
 }
@@ -56,30 +70,11 @@ GLuint ChunkMesh::createVAO() {
 	GLint bufferSize = 0;
 	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize);
 	if (bufferSize == 0) {
-		return 0; //to optimize?
+		return 0;
 	}
 
-	// Attribute 0: Position (1 uint32)
 	glEnableVertexAttribArray(0);
 	glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, formatSize * sizeof(uint32_t), (void*)0);
-
-	/*
-	// Attribute 1: Voxel ID (1 uint8)
-	glEnableVertexAttribArray(1);
-	glVertexAttribIPointer(1, 1, GL_UNSIGNED_BYTE, formatSize * sizeof(uint8_t), (void*)(3 * sizeof(uint8_t)));
-
-	// Attribute 2: Face ID (1 uint8)
-	glEnableVertexAttribArray(2);
-	glVertexAttribIPointer(2, 1, GL_UNSIGNED_BYTE, formatSize * sizeof(uint8_t), (void*)(4 * sizeof(uint8_t)));
-
-	// Attribute 3: AO ID (1 uint8)
-	glEnableVertexAttribArray(3);
-	glVertexAttribIPointer(3, 1, GL_UNSIGNED_BYTE, formatSize * sizeof(uint8_t), (void*)(5 * sizeof(uint8_t)));
-
-	// Attribute 4: Flip ID (1 uint8)
-	glEnableVertexAttribArray(4);
-	glVertexAttribIPointer(4, 1, GL_UNSIGNED_BYTE, formatSize * sizeof(uint8_t), (void*)(6 * sizeof(uint8_t)));
-	*/
 
 	// Unbind the VAO
 	glBindVertexArray(0);

@@ -1,6 +1,5 @@
 #include "VoxelEngine.hpp"
 #include "Settings.hpp"
-#include <cstdlib>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -79,13 +78,27 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
     
-    // Get the camera from the window user pointer
     VoxelEngine* engine = static_cast<VoxelEngine*>(glfwGetWindowUserPointer(window));
     if (engine && engine->player) {
         float aspectRatio = static_cast<float>(width) / height;
         engine->player->setAspectRatio(aspectRatio);
     }
 }
+
+void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+	(void) mods;
+    VoxelEngine* engine = static_cast<VoxelEngine*>(glfwGetWindowUserPointer(window));
+    if (action == GLFW_PRESS) {
+        VoxelHandler* voxelHandler = engine->scene->getWorld()->getVoxelHandler();
+        
+        if (button == GLFW_MOUSE_BUTTON_LEFT) {
+            voxelHandler->setVoxel();
+        } else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+            voxelHandler->switchMode();
+        }
+    }
+}
+
 
 void VoxelEngine::onInit()
 {
@@ -98,6 +111,7 @@ void VoxelEngine::onInit()
     
     // Register the scroll callback
     glfwSetScrollCallback(window, scroll_callback);
+	glfwSetMouseButtonCallback(window, mouseButtonCallback);
 
 	// Register the window callbacks
     glfwSetKeyCallback(window, keyCallback);

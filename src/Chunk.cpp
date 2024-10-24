@@ -78,3 +78,7 @@ std::vector<uint8_t>& Chunk::getVoxels() {
 glm::ivec3 Chunk::getPosition() {
 	return position;
 }
+
+ChunkMesh* Chunk::getMesh() {
+	return mesh;
+}

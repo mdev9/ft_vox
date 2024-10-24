@@ -1,5 +1,6 @@
 #include "World.hpp"
 #include "VoxelEngine.hpp"
+#include "VoxelHandler.hpp"
 
 World::World(VoxelEngine* engine) : engine(engine) {
     chunks.resize(WORLD_VOL, nullptr);
@@ -20,6 +21,8 @@ World::World(VoxelEngine* engine) : engine(engine) {
     auto endMesh = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> elapsedMesh = endMesh - startMesh;
     std::cout << "\tDone in " << elapsedMesh.count() << "s!" << std::endl;
+
+	voxelHandler = new VoxelHandler(this);
 }
 
 void World::buildChunks() {
@@ -50,7 +53,7 @@ void World::buildChunkMesh() {
 }
 
 void World::update() {
-    // Any world updates
+	voxelHandler->update();
 }
 
 void World::render() {
@@ -71,4 +74,12 @@ World::~World() {
     for (auto chunk : chunks) {
         delete chunk;
     }
+}
+
+std::vector<Chunk*> World::getChunks() {
+	return chunks;
+}
+
+VoxelHandler* World::getVoxelHandler() {
+	return voxelHandler;
 }

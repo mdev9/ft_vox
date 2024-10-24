@@ -12,3 +12,7 @@ void Scene::update() {
 void Scene::render() {
 	world->render();
 }
+
+World* Scene::getWorld() {
+	return world;
+}
