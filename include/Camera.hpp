@@ -20,11 +20,12 @@ class Camera {
 		void rotateYaw(float delta_x);
 		void move(const glm::vec3& direction, float velocity);
 		void toggleSpeedMultiplier();
-		void setSpeed(float speed);
+		void setSpeed();
 		void setAspectRatio(float aspectRatio);
 
 	protected:
 		float speedMultiplier = 1.0f;
+		float speedAdjustment = 1.0f;
 		float playerSpeed = 5.0f;
 };
 

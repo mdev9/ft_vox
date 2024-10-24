@@ -62,7 +62,8 @@ VoxelEngine::~VoxelEngine()
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 	(void) xoffset;
-    Player* player = static_cast<Player*>(glfwGetWindowUserPointer(window));
+    VoxelEngine* engine = static_cast<VoxelEngine*>(glfwGetWindowUserPointer(window));
+    Player* player = engine->player;
     if (player)
         player->scrollControl(yoffset);
 }

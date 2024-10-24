@@ -13,10 +13,11 @@ void Player::update() {
 }
 
 void Player::scrollControl(double yoffset) {
-	if (yoffset > 0)
-		setSpeed(PLAYER_SPEED + SPEED_ADJUSTMENT_AMOUNT);
-	else if (yoffset < 0)
-		setSpeed(PLAYER_SPEED - SPEED_ADJUSTMENT_AMOUNT);
+	if (yoffset > 0 && speedAdjustment < 50.0f)
+		speedAdjustment += SPEED_ADJUSTMENT_AMOUNT;
+	else if (yoffset < 0 && speedAdjustment > SPEED_ADJUSTMENT_AMOUNT)
+		speedAdjustment -= SPEED_ADJUSTMENT_AMOUNT;
+	setSpeed();
 }
 
 void Player::mouseControl() {
