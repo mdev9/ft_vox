@@ -1,4 +1,5 @@
 #include "ChunkMesh.hpp"
+#include "VoxelHandler.hpp"
 #include "chunk_mesh_builder.hpp"
 #include <cstdint>
 
@@ -7,10 +8,10 @@ ChunkMesh::ChunkMesh(Chunk* chunk) : BaseMesh(), chunk(chunk) {
 	vboFormat = {"1u4"};
 	formatSize = calculateFormatSize(vboFormat);
 	attrs = {"packed_data"};
-	vao = createVAO();
+	vao = createVAO(0);
 }
 
-void ChunkMesh::rebuild() {
+void ChunkMesh::rebuild(VoxelHandler *handler) {
 	if (vao) {
 		glDeleteVertexArrays(1, &vao);
 		vao = 0;
@@ -21,11 +22,11 @@ void ChunkMesh::rebuild() {
 	}
 
 	// Generate new VAO
-	vao = createVAO();
+	vao = createVAO(handler);
 }
 
-std::vector<uint32_t> ChunkMesh::getVertexData() {
-    return build_chunk_mesh(chunk->getVoxels(), formatSize, chunk->getPosition(), chunk->getWorld()->getVoxels());
+std::vector<uint32_t> ChunkMesh::getVertexData(VoxelHandler *handler) {
+    return build_chunk_mesh(chunk->getVoxels(), formatSize, chunk->getPosition(), chunk->getWorld()->getVoxels(), handler);
 }
 
 void ChunkMesh::render() {
@@ -52,14 +53,14 @@ int ChunkMesh::calculateFormatSize(const std::vector<std::string>& format) {
 	return totalSize;
 }
 
-GLuint ChunkMesh::createVAO() {
+GLuint ChunkMesh::createVAO(VoxelHandler *handler) {
 	// Create and bind the VAO
 	GLuint vaoID;
 	glGenVertexArrays(1, &vaoID);
 	glBindVertexArray(vaoID);
 
 	// Get the vertex data for the chunk
-	std::vector<uint32_t> vertexData = getVertexData();
+	std::vector<uint32_t> vertexData = getVertexData(handler);
 	vertexCount = vertexData.size() / formatSize;
 
 	// Create and bind the VBO

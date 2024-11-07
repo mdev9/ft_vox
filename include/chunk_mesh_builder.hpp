@@ -6,7 +6,8 @@
 #include <array>
 #include <iostream>
 #include "Settings.hpp"
+#include "VoxelHandler.hpp"
 
-std::vector<uint32_t> build_chunk_mesh(const std::vector<uint8_t>& chunk_voxels, int format_size, glm::ivec3 chunk_position, const std::vector<std::vector<uint8_t>>& world_voxels);
+std::vector<uint32_t> build_chunk_mesh(const std::vector<uint8_t>& chunk_voxels, int format_size, glm::ivec3 chunk_position, const std::vector<std::vector<uint8_t>>& world_voxels, VoxelHandler *handler);
 
 #endif

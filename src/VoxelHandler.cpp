@@ -15,9 +15,12 @@ void VoxelHandler::addVoxel() {
 
 void VoxelHandler::removeVoxel() {
 	if (voxel_id) {
-		chunk->getVoxels()[voxel_index] = 0;
+		//chunk->getVoxels()[voxel_index] = 0;
+		std::cout << "removing voxel " << voxel_index << std::endl;
+		std::cout << voxel_local_pos.x << ", " << voxel_local_pos.y << ", " << voxel_local_pos.z << std::endl;
+		std::cout << voxel_world_pos.x << ", " << voxel_world_pos.y << ", " << voxel_world_pos.z << std::endl;
 		
-		chunk->getMesh()->rebuild();
+		chunk->getMesh()->rebuild(this);
 	}
 }
 

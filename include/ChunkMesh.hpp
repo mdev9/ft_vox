@@ -3,6 +3,9 @@
 
 #include "BaseMesh.hpp"
 #include "Chunk.hpp"
+#include "VoxelHandler.hpp"
+
+class VoxelHandler;
 
 class Chunk;
 
@@ -11,9 +14,9 @@ public:
     ChunkMesh(Chunk* chunk);
     ~ChunkMesh();
 
-    std::vector<uint32_t> getVertexData() override;
+    std::vector<uint32_t> getVertexData(VoxelHandler *handler) override;
 	void render() override;
-	void rebuild();
+	void rebuild(VoxelHandler *);
 
 private:
     Chunk* chunk;
@@ -24,7 +27,7 @@ private:
     std::vector<std::string> attrs;
 
     int calculateFormatSize(const std::vector<std::string>& format);
-    GLuint createVAO();
+    GLuint createVAO(VoxelHandler *handler);
 };
 
 #endif

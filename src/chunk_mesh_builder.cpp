@@ -1,5 +1,6 @@
 #include "chunk_mesh_builder.hpp"
 #include "Settings.hpp"
+#include "VoxelHandler.hpp"
 
 uint32_t pack_data(int x, int y, int z, int voxel_id, int face_id, int ao_id, bool flip_id) {
     // x: 6 bits, y: 6 bits, z: 6 bits
@@ -153,9 +154,11 @@ std::array<int, 4> get_ao(const glm::ivec3& local_pos, const glm::ivec3& world_p
     return ao;
 }
 
-std::vector<uint32_t> build_chunk_mesh(const std::vector<uint8_t>& chunk_voxels, int format_size, glm::ivec3 chunk_pos, const std::vector<std::vector<uint8_t>>& world_voxels) {
+std::vector<uint32_t> build_chunk_mesh(const std::vector<uint8_t>& chunk_voxels, int format_size, glm::ivec3 chunk_pos, const std::vector<std::vector<uint8_t>>& world_voxels, VoxelHandler *handler) {
     std::vector<uint32_t> vertexData(CHUNK_VOL * 18 * format_size);
     int index = 0;
+
+	std::cout << handler->voxel_index << ": " << (int)chunk_voxels[handler->voxel_index] << std::endl;
 
     std::array<int, 4> ao;
     bool flip_id;
@@ -168,6 +171,8 @@ std::vector<uint32_t> build_chunk_mesh(const std::vector<uint8_t>& chunk_voxels,
 
 				int cx = chunk_pos.x, cy = chunk_pos.y, cz = chunk_pos.z;
 				int wx = x + cx * CHUNK_SIZE, wy = y + cy * CHUNK_SIZE, wz = z + cz * CHUNK_SIZE;
+
+				std::cout << x << ", " << y << ", " << z << std::endl;
 
                 // Check the faces
                 // Top face

@@ -21,7 +21,7 @@ class VoxelHandler {
 		VoxelEngine *engine;
 		std::vector<Chunk *> chunks;
 
-	private:
+	//private:
 		Chunk *chunk;
 		int voxel_id;
 		int voxel_index;
