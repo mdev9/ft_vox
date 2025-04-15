@@ -1,3 +1,47 @@
-*.o
 *.d
 ft_vox
+
+# === General C++ ===
+*.o
+*.obj
+*.so
+*.a
+*.lib
+*.dll
+*.exe
+*.pch
+*.pdb
+*.ilk
+*.exp
+*.log
+
+# === CMake ===
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# === Visual Studio ===
+*.sln
+*.vcxproj*
+*.user
+*.filters
+*.idb
+*.tlog
+*.ipch
+*.opendb
+*.VC.db
+.vs/
+
+# === Build directories ===
+build/
+build-linux/
+build-windows/
+bin/
+Debug/
+Release/
+out/
+x64/
+
+# === Others ===
+*.DS_Store
