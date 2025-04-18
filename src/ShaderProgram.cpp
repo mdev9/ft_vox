@@ -9,7 +9,7 @@ ShaderProgram::ShaderProgram(Player* player)
 	this->player = player;
 	
     // Load and compile shaders, then link into a program
-    chunkProgram = loadProgram("shaders/vertex.glsl", "shaders/fragment.glsl");
+    chunkProgram = loadProgram(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
     // Set initial uniforms
     setUniformsOnInit();
 }

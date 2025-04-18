@@ -2,7 +2,7 @@
 #include <stb_image.h>
 
 Textures::Textures() {
-	textureID = loadTexture("assets/frame.png");
+	textureID = loadTexture(TEXTURE_PATH);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureID);

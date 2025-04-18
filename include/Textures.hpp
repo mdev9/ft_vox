@@ -2,6 +2,7 @@
 #define TEXTURES_HPP
 
 #include <GL/glew.h>
+#include <Settings.hpp>
 #include <iostream>
 
 class Textures {
